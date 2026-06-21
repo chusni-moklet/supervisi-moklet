@@ -47,17 +47,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      // Whitelist restriction
-      const { data: users } = await supabase.from('users').select('*').eq('email', email);
+      // Whitelist restriction & Auto-Register
+      let { data: users } = await supabase.from('users').select('*').eq('email', email);
       
       if (!users || users.length === 0) {
-        await supabase.auth.signOut();
-        if (mounted) {
-          setAuthError('Email Anda belum didaftarkan oleh Admin.');
-          setCurrentUser(null);
-          setIsInitializing(false);
+        // Auto-register user baru sebagai GURU
+        const newUserName = session.user.user_metadata?.full_name || email.split('@')[0];
+        const { data: newUser, error: insertError } = await supabase.from('users').insert([{
+          email: email,
+          name: newUserName,
+          role: 'GURU'
+        }]).select();
+
+        if (insertError || !newUser || newUser.length === 0) {
+          await supabase.auth.signOut();
+          if (mounted) {
+            setAuthError('Gagal membuat akun otomatis. Hubungi Admin.');
+            setCurrentUser(null);
+            setIsInitializing(false);
+          }
+          return;
         }
-        return;
+        users = newUser;
       }
 
       if (mounted) {

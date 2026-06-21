@@ -39,21 +39,17 @@ export default function StatsCards() {
 
   useEffect(() => {
     async function loadStats() {
-      const [{ count: guruCount }, { count: obsCount }, { count: schedCount }] = await Promise.all([
-        supabase.from('teachers').select('*', { count: 'exact', head: true }),
-        supabase.from('observations').select('*', { count: 'exact', head: true }),
-        supabase.from('schedules').select('*', { count: 'exact', head: true }).eq('status', 'Terjadwal')
+      const [usersRes, scheduledRes, completedRes] = await Promise.all([
+        supabase.from('users').select('id', { count: 'exact', head: true }).eq('role', 'GURU'),
+        supabase.from('schedules').select('id', { count: 'exact', head: true }).eq('status', 'Terjadwal'),
+        supabase.from('observations').select('id', { count: 'exact', head: true }),
       ]);
       
-      const totalGuru = guruCount || 0;
-      const sudah = obsCount || 0;
-      const terjadwal = schedCount || 0;
-      
       setStats({
-        totalGuru,
-        sudahSupervisi: sudah,
-        belumSupervisi: Math.max(0, totalGuru - sudah - terjadwal),
-        terjadwal
+        totalGuru: usersRes.count || 0,
+        sudahSupervisi: completedRes.count || 0,
+        terjadwal: scheduledRes.count || 0,
+        belumSupervisi: Math.max(0, (usersRes.count || 0) - (completedRes.count || 0) - (scheduledRes.count || 0)),
       });
       setLoading(false);
     }

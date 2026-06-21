@@ -8,7 +8,7 @@ import {
   observationHeaderSchema,
 } from '@/lib/schemas';
 import { supabase } from '@/lib/supabase';
-import { type ScoreValue, type User, type Teacher, type IndicatorCategory, type Indicator } from '@/lib/types';
+import { type ScoreValue, type User, type IndicatorCategory, type Indicator } from '@/lib/types';
 import { getScoreCategory, getScoreCategoryColor, cn } from '@/lib/utils';
 import PageHeader from '@/components/ui/page-header';
 import ScoreBadge from '@/components/ui/score-badge';
@@ -32,7 +32,7 @@ export default function ObservationForm() {
   // Supabase Data States
   const [categories, setCategories] = useState<IndicatorCategory[]>([]);
   const [users, setUsers] = useState<User[]>([]);
-  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [teachers, setTeachers] = useState<User[]>([]);
   const [allIndicators, setAllIndicators] = useState<Indicator[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -42,11 +42,11 @@ export default function ObservationForm() {
         supabase.from('users').select('*').in('role', ['SUPER_ADMIN', 'ADMIN', 'KEPALA_SEKOLAH']),
         supabase.from('indicator_categories').select('*').order('sort_order'),
         supabase.from('indicators').select('*').order('number'),
-        supabase.from('teachers').select('*')
+        supabase.from('users').select('*').eq('role', 'GURU')
       ]);
 
       if (userRes.data) setUsers(userRes.data as User[]);
-      if (teachRes.data) setTeachers(teachRes.data as Teacher[]);
+      if (teachRes.data) setTeachers(teachRes.data as User[]);
       if (catRes.data && indRes.data) {
         setAllIndicators(indRes.data as Indicator[]);
         const merged = catRes.data.map(cat => ({
@@ -126,7 +126,7 @@ export default function ObservationForm() {
         observer_id: data.observerId,
         teacher_id: data.teacherId,
         subject: selectedTeacher?.subject,
-        class_name: selectedTeacher?.className,
+        class_name: selectedTeacher?.class_name,
         date: data.date,
         total_score: totalScore,
         max_score: maxScore,
@@ -253,7 +253,7 @@ export default function ObservationForm() {
                   </label>
                   <input
                     className="input bg-slate-50"
-                    value={selectedTeacher?.className || ''}
+                    value={selectedTeacher?.class_name || ''}
                     readOnly
                     placeholder="— Pilih guru terlebih dahulu"
                   />

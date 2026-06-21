@@ -6,6 +6,9 @@ export interface User {
   email: string;
   role: Role;
   avatar?: string;
+  nip?: string;
+  subject?: string;
+  class_name?: string;
 }
 
 export interface Teacher {

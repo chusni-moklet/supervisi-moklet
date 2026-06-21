@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { type User, type Role, ROLE_LABELS } from '@/lib/types';
+import { useAuth } from '@/lib/auth-context';
 import RoleBadge from '@/components/ui/role-badge';
 import PageHeader from '@/components/ui/page-header';
 import { cn } from '@/lib/utils';
@@ -19,6 +20,7 @@ import {
 const ALL_ROLES: Role[] = ['SUPER_ADMIN', 'KEPALA_SEKOLAH', 'ADMIN', 'GURU'];
 
 export default function UserManagementTable() {
+  const { currentUser } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -45,6 +47,9 @@ export default function UserManagementTable() {
   const [newName, setNewName] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [newRole, setNewRole] = useState<Role>('GURU');
+  const [newNip, setNewNip] = useState('');
+  const [newSubject, setNewSubject] = useState('');
+  const [newClass, setNewClass] = useState('');
 
   // Edit role state
   const [editRole, setEditRole] = useState<Role>('GURU');
@@ -67,9 +72,16 @@ export default function UserManagementTable() {
   const handleAddUser = async () => {
     if (!newName || !newEmail) return;
     
+    const newUserObj: any = { name: newName, email: newEmail, role: newRole };
+    if (newRole === 'GURU') {
+      if (newNip) newUserObj.nip = newNip;
+      if (newSubject) newUserObj.subject = newSubject;
+      if (newClass) newUserObj.class_name = newClass;
+    }
+
     const { data, error } = await supabase
       .from('users')
-      .insert([{ name: newName, email: newEmail, role: newRole }])
+      .insert([newUserObj])
       .select();
 
     if (error) {
@@ -86,6 +98,9 @@ export default function UserManagementTable() {
     setNewName('');
     setNewEmail('');
     setNewRole('GURU');
+    setNewNip('');
+    setNewSubject('');
+    setNewClass('');
   };
 
   const handleChangeRole = async () => {
@@ -172,6 +187,7 @@ export default function UserManagementTable() {
                 <th style={{ width: 50 }}>No</th>
                 <th>Nama</th>
                 <th>Email</th>
+                <th>Info Guru</th>
                 <th>Role</th>
                 <th style={{ width: 140 }}>Aksi</th>
               </tr>
@@ -182,22 +198,35 @@ export default function UserManagementTable() {
                   <td className="font-medium text-slate-400">{idx + 1}</td>
                   <td className="font-medium">{user.name}</td>
                   <td className="text-slate-500">{user.email}</td>
+                  <td className="text-xs text-slate-500 space-y-1">
+                    {user.role === 'GURU' ? (
+                      <>
+                        {user.nip && <div className="font-mono text-[10px] bg-slate-100 inline-block px-1.5 rounded text-slate-600 mb-1">{user.nip}</div>}
+                        {user.subject && <div>Mapel: <span className="font-medium text-slate-700">{user.subject}</span></div>}
+                        {user.class_name && <div>Kelas: <span className="font-medium text-slate-700">{user.class_name}</span></div>}
+                      </>
+                    ) : (
+                      <span className="text-slate-300">-</span>
+                    )}
+                  </td>
                   <td>
                     <RoleBadge role={user.role} />
                   </td>
                   <td>
                     <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => {
-                          setEditingUser(user);
-                          setEditRole(user.role);
-                        }}
-                        id={`btn-edit-${user.id}`}
-                        className="btn btn-ghost btn-sm text-blue-600 hover:bg-blue-50"
-                        title="Ubah Role"
-                      >
-                        <Pencil className="w-3.5 h-3.5" />
-                      </button>
+                      {currentUser?.role === 'SUPER_ADMIN' && (
+                        <button
+                          onClick={() => {
+                            setEditingUser(user);
+                            setEditRole(user.role);
+                          }}
+                          id={`btn-edit-${user.id}`}
+                          className="btn btn-ghost btn-sm text-blue-600 hover:bg-blue-50"
+                          title="Ubah Role"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                       <button
                         onClick={() => setDeletingUser(user)}
                         id={`btn-delete-${user.id}`}
@@ -212,7 +241,7 @@ export default function UserManagementTable() {
               ))}
               {filteredUsers.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="text-center py-8 text-slate-400">
+                  <td colSpan={6} className="text-center py-8 text-slate-400">
                     Tidak ada user ditemukan
                   </td>
                 </tr>
@@ -282,6 +311,46 @@ export default function UserManagementTable() {
                   ))}
                 </select>
               </div>
+
+              {newRole === 'GURU' && (
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-3 animate-fade-in-up">
+                  <h4 className="text-xs font-semibold text-slate-500 uppercase">Informasi Guru (Opsional)</h4>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">
+                      NIP
+                    </label>
+                    <input
+                      className="input py-1.5 px-3 text-sm"
+                      placeholder="Contoh: 198001012005011001"
+                      value={newNip}
+                      onChange={e => setNewNip(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">
+                      Mata Pelajaran
+                    </label>
+                    <input
+                      className="input py-1.5 px-3 text-sm"
+                      placeholder="Contoh: Pemrograman Web"
+                      value={newSubject}
+                      onChange={e => setNewSubject(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">
+                      Kelas
+                    </label>
+                    <input
+                      className="input py-1.5 px-3 text-sm"
+                      placeholder="Contoh: XI RPL 1"
+                      value={newClass}
+                      onChange={e => setNewClass(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+
               <div className="flex gap-2 pt-2">
                 <button
                   onClick={() => setAddingUser(false)}
