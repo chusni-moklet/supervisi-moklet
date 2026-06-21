@@ -32,7 +32,7 @@ export const MOCK_USERS: User[] = [
     id: '44444444-4444-4444-4444-444444444444',
     name: 'Agus Salim',
     email: 'agus@smktelkom-mlg.sch.id',
-    role: 'GURU',
+    role: 'ADMIN',
   },
 ];
 

@@ -42,7 +42,7 @@ export default function ObservationForm() {
         supabase.from('users').select('*').in('role', ['SUPER_ADMIN', 'ADMIN', 'KEPALA_SEKOLAH']),
         supabase.from('indicator_categories').select('*').order('sort_order'),
         supabase.from('indicators').select('*').order('number'),
-        supabase.from('users').select('*').eq('role', 'GURU')
+        supabase.from('users').select('*').eq('role', 'ADMIN')
       ]);
 
       if (userRes.data) setUsers(userRes.data as User[]);

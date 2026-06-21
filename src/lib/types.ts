@@ -1,4 +1,4 @@
-export type Role = 'SUPER_ADMIN' | 'KEPALA_SEKOLAH' | 'ADMIN' | 'GURU';
+export type Role = 'SUPER_ADMIN' | 'KEPALA_SEKOLAH' | 'ADMIN';
 
 export interface User {
   id: string;
@@ -102,20 +102,23 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     'view_dashboard',
     'view_all_observations',
     'view_own_observations',
+    'create_observation',
+    'manage_indicators',
+    'manage_schedules',
+    'manage_users',
   ],
   ADMIN: [
     'view_dashboard',
     'view_all_observations',
+    'view_own_observations',
     'create_observation',
     'manage_indicators',
     'manage_schedules',
   ],
-  GURU: ['view_dashboard', 'view_own_observations'],
 };
 
 export const ROLE_LABELS: Record<Role, string> = {
   SUPER_ADMIN: 'Super Admin',
   KEPALA_SEKOLAH: 'Kepala Sekolah',
   ADMIN: 'Admin',
-  GURU: 'Guru',
 };

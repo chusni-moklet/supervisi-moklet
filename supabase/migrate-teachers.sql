@@ -16,7 +16,7 @@ SELECT
   id, 
   name, 
   CONCAT(LOWER(REPLACE(name, ' ', '.')), '@smktelkom-mlg.sch.id'), 
-  'GURU', 
+  'ADMIN', 
   nip, 
   subject, 
   class_name

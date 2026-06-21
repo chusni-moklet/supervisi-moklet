@@ -18,7 +18,7 @@ export type ObservationHeaderData = z.infer<typeof observationHeaderSchema>;
 export const userFormSchema = z.object({
   name: z.string().min(2, 'Nama minimal 2 karakter'),
   email: z.string().email('Email tidak valid'),
-  role: z.enum(['SUPER_ADMIN', 'KEPALA_SEKOLAH', 'ADMIN', 'GURU'], {
+  role: z.enum(['SUPER_ADMIN', 'KEPALA_SEKOLAH', 'ADMIN'], {
     message: 'Pilih role',
   }),
   nip: z.string().optional(),

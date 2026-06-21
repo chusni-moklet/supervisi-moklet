@@ -17,7 +17,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 
-const ALL_ROLES: Role[] = ['SUPER_ADMIN', 'KEPALA_SEKOLAH', 'ADMIN', 'GURU'];
+const ALL_ROLES: Role[] = ['SUPER_ADMIN', 'KEPALA_SEKOLAH', 'ADMIN'];
 
 export default function UserManagementTable() {
   const { currentUser } = useAuth();
@@ -46,13 +46,13 @@ export default function UserManagementTable() {
   // New user form state
   const [newName, setNewName] = useState('');
   const [newEmail, setNewEmail] = useState('');
-  const [newRole, setNewRole] = useState<Role>('GURU');
+  const [newRole, setNewRole] = useState<Role>('ADMIN');
   const [newNip, setNewNip] = useState('');
   const [newSubject, setNewSubject] = useState('');
   const [newClass, setNewClass] = useState('');
 
   // Edit role state
-  const [editRole, setEditRole] = useState<Role>('GURU');
+  const [editRole, setEditRole] = useState<Role>('ADMIN');
 
   const filteredUsers = useMemo(() => {
     if (!searchQuery) return users;
@@ -73,7 +73,7 @@ export default function UserManagementTable() {
     if (!newName || !newEmail) return;
     
     const newUserObj: any = { name: newName, email: newEmail, role: newRole };
-    if (newRole === 'GURU') {
+    if (newRole === 'ADMIN') {
       if (newNip) newUserObj.nip = newNip;
       if (newSubject) newUserObj.subject = newSubject;
       if (newClass) newUserObj.class_name = newClass;
@@ -97,7 +97,7 @@ export default function UserManagementTable() {
     setAddingUser(false);
     setNewName('');
     setNewEmail('');
-    setNewRole('GURU');
+    setNewRole('ADMIN');
     setNewNip('');
     setNewSubject('');
     setNewClass('');
@@ -149,14 +149,16 @@ export default function UserManagementTable() {
         title="Manajemen User"
         description="Kelola akun pengguna dan role akses"
         actions={
-          <button
-            onClick={() => setAddingUser(true)}
-            id="btn-add-user"
-            className="btn btn-primary btn-sm"
-          >
-            <UserPlus className="w-4 h-4" />
-            Tambah User
-          </button>
+          currentUser?.role === 'SUPER_ADMIN' && (
+            <button
+              onClick={() => setAddingUser(true)}
+              id="btn-add-user"
+              className="btn btn-primary btn-sm"
+            >
+              <UserPlus className="w-4 h-4" />
+              Tambah User
+            </button>
+          )
         }
       />
 
@@ -199,7 +201,7 @@ export default function UserManagementTable() {
                   <td className="font-medium">{user.name}</td>
                   <td className="text-slate-500">{user.email}</td>
                   <td className="text-xs text-slate-500 space-y-1">
-                    {user.role === 'GURU' ? (
+                    {user.role === 'ADMIN' ? (
                       <>
                         {user.nip && <div className="font-mono text-[10px] bg-slate-100 inline-block px-1.5 rounded text-slate-600 mb-1">{user.nip}</div>}
                         {user.subject && <div>Mapel: <span className="font-medium text-slate-700">{user.subject}</span></div>}
@@ -215,26 +217,28 @@ export default function UserManagementTable() {
                   <td>
                     <div className="flex items-center gap-1">
                       {currentUser?.role === 'SUPER_ADMIN' && (
-                        <button
-                          onClick={() => {
-                            setEditingUser(user);
-                            setEditRole(user.role);
-                          }}
-                          id={`btn-edit-${user.id}`}
-                          className="btn btn-ghost btn-sm text-blue-600 hover:bg-blue-50"
-                          title="Ubah Role"
-                        >
-                          <Pencil className="w-3.5 h-3.5" />
-                        </button>
+                        <>
+                          <button
+                            onClick={() => {
+                              setEditingUser(user);
+                              setEditRole(user.role);
+                            }}
+                            id={`btn-edit-${user.id}`}
+                            className="btn btn-ghost btn-sm text-blue-600 hover:bg-blue-50"
+                            title="Ubah Role"
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => setDeletingUser(user)}
+                            id={`btn-delete-${user.id}`}
+                            className="btn btn-ghost btn-sm text-red-500 hover:bg-red-50"
+                            title="Hapus"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </>
                       )}
-                      <button
-                        onClick={() => setDeletingUser(user)}
-                        id={`btn-delete-${user.id}`}
-                        className="btn btn-ghost btn-sm text-red-500 hover:bg-red-50"
-                        title="Hapus"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
                     </div>
                   </td>
                 </tr>
@@ -312,9 +316,9 @@ export default function UserManagementTable() {
                 </select>
               </div>
 
-              {newRole === 'GURU' && (
+              {newRole === 'ADMIN' && (
                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-3 animate-fade-in-up">
-                  <h4 className="text-xs font-semibold text-slate-500 uppercase">Informasi Guru (Opsional)</h4>
+                  <h4 className="text-xs font-semibold text-slate-500 uppercase">Informasi Tambahan (Opsional)</h4>
                   <div>
                     <label className="block text-xs font-medium text-slate-600 mb-1">
                       NIP

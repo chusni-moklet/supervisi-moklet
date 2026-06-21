@@ -10,8 +10,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TYPE user_role AS ENUM (
   'SUPER_ADMIN',
   'KEPALA_SEKOLAH',
-  'ADMIN',
-  'GURU'
+  'ADMIN'
 );
 
 -- ── Users Table ───────────────────────────
@@ -20,7 +19,7 @@ CREATE TABLE public.users (
   auth_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   email TEXT UNIQUE NOT NULL,
-  role user_role NOT NULL DEFAULT 'GURU',
+  role user_role NOT NULL DEFAULT 'ADMIN',
   avatar_url TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()

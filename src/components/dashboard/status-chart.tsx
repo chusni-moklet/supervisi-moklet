@@ -12,7 +12,7 @@ export default function StatusChart() {
   useEffect(() => {
     async function loadStats() {
       const [usersRes, scheduledRes, completedRes] = await Promise.all([
-        supabase.from('users').select('id', { count: 'exact', head: true }).eq('role', 'GURU'),
+        supabase.from('users').select('id', { count: 'exact', head: true }).eq('role', 'ADMIN'),
         supabase.from('schedules').select('id', { count: 'exact', head: true }).eq('status', 'Terjadwal'),
         supabase.from('observations').select('id', { count: 'exact', head: true }),
       ]);

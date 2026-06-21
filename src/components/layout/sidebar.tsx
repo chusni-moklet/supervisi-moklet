@@ -10,6 +10,7 @@ import {
   LogOut,
   X,
   GraduationCap,
+  FileText,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { cn } from '@/lib/utils';
@@ -26,6 +27,12 @@ const NAV_ITEMS = [
     label: 'Dashboard',
     icon: LayoutDashboard,
     permissions: [] as string[], // accessible by all
+  },
+  {
+    href: '/data-supervisi',
+    label: 'Data Supervisi',
+    icon: FileText,
+    permissions: ['view_all_observations'],
   },
   {
     href: '/observasi',

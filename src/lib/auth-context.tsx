@@ -51,12 +51,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       let { data: users } = await supabase.from('users').select('*').eq('email', email);
       
       if (!users || users.length === 0) {
-        // Auto-register user baru sebagai GURU
+        // Auto-register user baru sebagai ADMIN
         const newUserName = session.user.user_metadata?.full_name || email.split('@')[0];
         const { data: newUser, error: insertError } = await supabase.from('users').insert([{
           email: email,
           name: newUserName,
-          role: 'GURU'
+          role: 'ADMIN'
         }]).select();
 
         if (insertError || !newUser || newUser.length === 0) {

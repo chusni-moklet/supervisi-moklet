@@ -153,11 +153,7 @@ export default function DashboardPage() {
 
   return (
     <AppShell>
-      {currentUser?.role === 'GURU' ? (
-        <GuruDashboard />
-      ) : (
-        <ExecutiveDashboard />
-      )}
+      <ExecutiveDashboard />
     </AppShell>
   );
 }
