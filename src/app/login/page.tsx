@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
-import { GraduationCap, Chrome } from 'lucide-react';
+import { GraduationCap } from 'lucide-react';
 
 export default function LoginPage() {
   const { loginWithGoogle, isAuthenticated, authError, isInitializing } = useAuth();
