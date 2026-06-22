@@ -38,11 +38,11 @@ export const MOCK_USERS: User[] = [
 
 // ── Teachers ─────────────────────────────────────────────
 export const MOCK_TEACHERS: Teacher[] = [
-  { id: 't11', name: 'Yuni Astuti, S.Pd.', nip: '199303152016012011', subject: 'Kimia', className: 'X TKJ 2' },
-  { id: 't12', name: 'Fajar Nugroho, S.T.', nip: '198802102012011012', subject: 'Desain Grafis', className: 'XI MM 1' },
-  { id: 't13', name: 'Maya Sari, S.Pd.', nip: '199006202014012013', subject: 'Matematika', className: 'XII TKJ 1' },
-  { id: 't14', name: 'Rizky Aditya, S.Kom.', nip: '199108052015011014', subject: 'Sistem Operasi', className: 'XI TKJ 2' },
-  { id: 't15', name: 'Nita Puspita, S.Pd.', nip: '199204102016012015', subject: 'Bahasa Jepang', className: 'X MM 2' },
+  { id: 't11', name: 'Yuni Astuti, S.Pd.', department: 'Hubinkom' },
+  { id: 't12', name: 'Fajar Nugroho, S.T.', department: 'Kesiswaan' },
+  { id: 't13', name: 'Maya Sari, S.Pd.', department: 'Kurikulum' },
+  { id: 't14', name: 'Rizky Aditya, S.Kom.', department: 'QDPM' },
+  { id: 't15', name: 'Nita Puspita, S.Pd.', department: 'Sarpra' },
 ];
 
 // ── Indicators ───────────────────────────────────────────
@@ -86,8 +86,7 @@ function makeObs(
   observerName: string,
   teacherId: string,
   teacherName: string,
-  subject: string,
-  className: string,
+  department: string,
   date: string,
   totalScore: number,
 ): Observation {
@@ -99,8 +98,7 @@ function makeObs(
     observerName,
     teacherId,
     teacherName,
-    subject,
-    className,
+    department,
     date,
     scores: [],
     totalScore,
@@ -112,28 +110,28 @@ function makeObs(
 }
 
 export const MOCK_OBSERVATIONS: Observation[] = [
-  makeObs('obs1', 'u1', 'Chusni Mubarok', 't1', 'Ahmad Fauzi, S.Pd.', 'Matematika', 'X RPL 1', '2026-05-10', 18),
-  makeObs('obs2', 'u3', 'Siti Rahmawati', 't2', 'Dewi Kartika, S.Pd.', 'Bahasa Inggris', 'XI RPL 2', '2026-05-12', 16),
-  makeObs('obs3', 'u1', 'Chusni Mubarok', 't3', 'Rudi Hermawan, S.T.', 'Pemrograman Web', 'XII RPL 1', '2026-05-15', 19),
-  makeObs('obs4', 'u3', 'Siti Rahmawati', 't4', 'Rina Fitriani, S.Pd.', 'Bahasa Indonesia', 'X TKJ 1', '2026-05-18', 14),
-  makeObs('obs5', 'u1', 'Chusni Mubarok', 't5', 'Hendra Wijaya, S.Kom.', 'Basis Data', 'XI RPL 1', '2026-05-20', 17),
-  makeObs('obs6', 'u3', 'Siti Rahmawati', 't6', 'Bambang Prasetyo, M.T.', 'Jaringan Komputer', 'XII TKJ 2', '2026-05-22', 12),
-  makeObs('obs7', 'u1', 'Chusni Mubarok', 't7', 'Sri Wahyuni, S.Pd.', 'Fisika', 'X MM 1', '2026-06-01', 15),
-  makeObs('obs8', 'u3', 'Siti Rahmawati', 't10', 'Doni Prasetya, S.Kom.', 'Pemrograman Mobile', 'XII RPL 2', '2026-06-05', 20),
-  makeObs('obs9', 'u1', 'Chusni Mubarok', 't13', 'Maya Sari, S.Pd.', 'Matematika', 'XII TKJ 1', '2026-06-08', 13),
-  makeObs('obs10', 'u3', 'Siti Rahmawati', 't8', 'Agus Supriyanto, S.Pd.', 'PKN', 'XI TKJ 1', '2026-06-10', 16),
+  makeObs('obs1', 'u1', 'Chusni Mubarok', 't1', 'Ahmad Fauzi, S.Pd.', 'Hubinkom', '2026-05-10', 18),
+  makeObs('obs2', 'u3', 'Siti Rahmawati', 't2', 'Dewi Kartika, S.Pd.', 'Kesiswaan', '2026-05-12', 16),
+  makeObs('obs3', 'u1', 'Chusni Mubarok', 't3', 'Rudi Hermawan, S.T.', 'Kurikulum', '2026-05-15', 19),
+  makeObs('obs4', 'u3', 'Siti Rahmawati', 't4', 'Rina Fitriani, S.Pd.', 'QDPM', '2026-05-18', 14),
+  makeObs('obs5', 'u1', 'Chusni Mubarok', 't5', 'Hendra Wijaya, S.Kom.', 'Sarpra', '2026-05-20', 17),
+  makeObs('obs6', 'u3', 'Siti Rahmawati', 't6', 'Bambang Prasetyo, M.T.', 'Tata Usaha', '2026-05-22', 12),
+  makeObs('obs7', 'u1', 'Chusni Mubarok', 't7', 'Sri Wahyuni, S.Pd.', 'Hubinkom', '2026-06-01', 15),
+  makeObs('obs8', 'u3', 'Siti Rahmawati', 't10', 'Doni Prasetya, S.Kom.', 'Kesiswaan', '2026-06-05', 20),
+  makeObs('obs9', 'u1', 'Chusni Mubarok', 't13', 'Maya Sari, S.Pd.', 'Kurikulum', '2026-06-08', 13),
+  makeObs('obs10', 'u3', 'Siti Rahmawati', 't8', 'Agus Supriyanto, S.Pd.', 'QDPM', '2026-06-10', 16),
 ];
 
 // ── Schedules ────────────────────────────────────────────
 export const MOCK_SCHEDULES: Schedule[] = [
-  { id: 's1', teacherId: 't9', teacherName: 'Lina Marlina, S.Pd.', subject: 'Seni Budaya', className: 'X RPL 2', observerId: 'u1', observerName: 'Chusni Mubarok', date: '2026-06-25', status: 'Terjadwal' },
-  { id: 's2', teacherId: 't11', teacherName: 'Yuni Astuti, S.Pd.', subject: 'Kimia', className: 'X TKJ 2', observerId: 'u3', observerName: 'Siti Rahmawati', date: '2026-06-26', status: 'Terjadwal' },
-  { id: 's3', teacherId: 't12', teacherName: 'Fajar Nugroho, S.T.', subject: 'Desain Grafis', className: 'XI MM 1', observerId: 'u1', observerName: 'Chusni Mubarok', date: '2026-06-28', status: 'Terjadwal' },
-  { id: 's4', teacherId: 't14', teacherName: 'Rizky Aditya, S.Kom.', subject: 'Sistem Operasi', className: 'XI TKJ 2', observerId: 'u3', observerName: 'Siti Rahmawati', date: '2026-07-01', status: 'Terjadwal' },
-  { id: 's5', teacherId: 't15', teacherName: 'Nita Puspita, S.Pd.', subject: 'Bahasa Jepang', className: 'X MM 2', observerId: 'u1', observerName: 'Chusni Mubarok', date: '2026-07-03', status: 'Terjadwal' },
-  { id: 's6', teacherId: 't1', teacherName: 'Ahmad Fauzi, S.Pd.', subject: 'Matematika', className: 'X RPL 1', observerId: 'u1', observerName: 'Chusni Mubarok', date: '2026-05-10', status: 'Selesai' },
-  { id: 's7', teacherId: 't2', teacherName: 'Dewi Kartika, S.Pd.', subject: 'Bahasa Inggris', className: 'XI RPL 2', observerId: 'u3', observerName: 'Siti Rahmawati', date: '2026-05-12', status: 'Selesai' },
-  { id: 's8', teacherId: 't3', teacherName: 'Rudi Hermawan, S.T.', subject: 'Pemrograman Web', className: 'XII RPL 1', observerId: 'u1', observerName: 'Chusni Mubarok', date: '2026-05-15', status: 'Selesai' },
+  { id: 's1', teacherId: 't9', teacherName: 'Lina Marlina, S.Pd.', department: 'Hubinkom', observerId: 'u1', observerName: 'Chusni Mubarok', date: '2026-06-25', status: 'Terjadwal' },
+  { id: 's2', teacherId: 't11', teacherName: 'Yuni Astuti, S.Pd.', department: 'Kesiswaan', observerId: 'u3', observerName: 'Siti Rahmawati', date: '2026-06-26', status: 'Terjadwal' },
+  { id: 's3', teacherId: 't12', teacherName: 'Fajar Nugroho, S.T.', department: 'Kurikulum', observerId: 'u1', observerName: 'Chusni Mubarok', date: '2026-06-28', status: 'Terjadwal' },
+  { id: 's4', teacherId: 't14', teacherName: 'Rizky Aditya, S.Kom.', department: 'QDPM', observerId: 'u3', observerName: 'Siti Rahmawati', date: '2026-07-01', status: 'Terjadwal' },
+  { id: 's5', teacherId: 't15', teacherName: 'Nita Puspita, S.Pd.', department: 'Sarpra', observerId: 'u1', observerName: 'Chusni Mubarok', date: '2026-07-03', status: 'Terjadwal' },
+  { id: 's6', teacherId: 't1', teacherName: 'Ahmad Fauzi, S.Pd.', department: 'Tata Usaha', observerId: 'u1', observerName: 'Chusni Mubarok', date: '2026-05-10', status: 'Selesai' },
+  { id: 's7', teacherId: 't2', teacherName: 'Dewi Kartika, S.Pd.', department: 'Hubinkom', observerId: 'u3', observerName: 'Siti Rahmawati', date: '2026-05-12', status: 'Selesai' },
+  { id: 's8', teacherId: 't3', teacherName: 'Rudi Hermawan, S.T.', department: 'Kesiswaan', observerId: 'u1', observerName: 'Chusni Mubarok', date: '2026-05-15', status: 'Selesai' },
 ];
 
 // ── Dashboard Stats ──────────────────────────────────────
@@ -146,12 +144,10 @@ export const MOCK_DASHBOARD_STATS: DashboardStats = {
 
 // ── Progress by Subject (for bar chart) ──────────────────
 export const MOCK_SUBJECT_PROGRESS = [
-  { subject: 'Matematika', avgScore: 78 },
-  { subject: 'B. Inggris', avgScore: 80 },
-  { subject: 'Pemrog. Web', avgScore: 95 },
-  { subject: 'B. Indonesia', avgScore: 70 },
-  { subject: 'Basis Data', avgScore: 85 },
-  { subject: 'Jar. Komputer', avgScore: 60 },
-  { subject: 'Fisika', avgScore: 75 },
-  { subject: 'Pemrog. Mobile', avgScore: 100 },
+  { department: 'Hubinkom', avgScore: 78 },
+  { department: 'Kesiswaan', avgScore: 80 },
+  { department: 'Kurikulum', avgScore: 95 },
+  { department: 'QDPM', avgScore: 70 },
+  { department: 'Sarpra', avgScore: 85 },
+  { department: 'Tata Usaha', avgScore: 60 },
 ];

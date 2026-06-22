@@ -47,9 +47,7 @@ export default function UserManagementTable() {
   const [newName, setNewName] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [newRole, setNewRole] = useState<Role>('ADMIN');
-  const [newNip, setNewNip] = useState('');
-  const [newSubject, setNewSubject] = useState('');
-  const [newClass, setNewClass] = useState('');
+  const [newDepartment, setNewDepartment] = useState('');
 
   // Edit role state
   const [editRole, setEditRole] = useState<Role>('ADMIN');
@@ -73,10 +71,8 @@ export default function UserManagementTable() {
     if (!newName || !newEmail) return;
     
     const newUserObj: any = { name: newName, email: newEmail, role: newRole };
-    if (newRole === 'ADMIN') {
-      if (newNip) newUserObj.nip = newNip;
-      if (newSubject) newUserObj.subject = newSubject;
-      if (newClass) newUserObj.class_name = newClass;
+    if (newRole === 'ADMIN' && newDepartment) {
+      newUserObj.department = newDepartment;
     }
 
     const { data, error } = await supabase
@@ -98,9 +94,7 @@ export default function UserManagementTable() {
     setNewName('');
     setNewEmail('');
     setNewRole('ADMIN');
-    setNewNip('');
-    setNewSubject('');
-    setNewClass('');
+    setNewDepartment('');
   };
 
   const handleChangeRole = async () => {
@@ -189,7 +183,7 @@ export default function UserManagementTable() {
                 <th style={{ width: 50 }}>No</th>
                 <th>Nama</th>
                 <th>Email</th>
-                <th>Info Guru</th>
+                <th>Bagian</th>
                 <th>Role</th>
                 <th style={{ width: 140 }}>Aksi</th>
               </tr>
@@ -200,16 +194,8 @@ export default function UserManagementTable() {
                   <td className="font-medium text-slate-400">{idx + 1}</td>
                   <td className="font-medium">{user.name}</td>
                   <td className="text-slate-500">{user.email}</td>
-                  <td className="text-xs text-slate-500 space-y-1">
-                    {user.role === 'ADMIN' ? (
-                      <>
-                        {user.nip && <div className="font-mono text-[10px] bg-slate-100 inline-block px-1.5 rounded text-slate-600 mb-1">{user.nip}</div>}
-                        {user.subject && <div>Mapel: <span className="font-medium text-slate-700">{user.subject}</span></div>}
-                        {user.class_name && <div>Kelas: <span className="font-medium text-slate-700">{user.class_name}</span></div>}
-                      </>
-                    ) : (
-                      <span className="text-slate-300">-</span>
-                    )}
+                  <td className="text-sm text-slate-600">
+                    {user.role === 'ADMIN' && user.department ? user.department : <span className="text-slate-300">-</span>}
                   </td>
                   <td>
                     <RoleBadge role={user.role} />
@@ -321,36 +307,18 @@ export default function UserManagementTable() {
                   <h4 className="text-xs font-semibold text-slate-500 uppercase">Informasi Tambahan (Opsional)</h4>
                   <div>
                     <label className="block text-xs font-medium text-slate-600 mb-1">
-                      NIP
+                      Bagian
                     </label>
-                    <input
-                      className="input py-1.5 px-3 text-sm"
-                      placeholder="Contoh: 198001012005011001"
-                      value={newNip}
-                      onChange={e => setNewNip(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-600 mb-1">
-                      Mata Pelajaran
-                    </label>
-                    <input
-                      className="input py-1.5 px-3 text-sm"
-                      placeholder="Contoh: Pemrograman Web"
-                      value={newSubject}
-                      onChange={e => setNewSubject(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-600 mb-1">
-                      Kelas
-                    </label>
-                    <input
-                      className="input py-1.5 px-3 text-sm"
-                      placeholder="Contoh: XI RPL 1"
-                      value={newClass}
-                      onChange={e => setNewClass(e.target.value)}
-                    />
+                    <select
+                      className="input select text-sm py-1.5 px-3"
+                      value={newDepartment}
+                      onChange={e => setNewDepartment(e.target.value)}
+                    >
+                      <option value="">Pilih Bagian</option>
+                      {['Hubinkom', 'Kesiswaan', 'Kurikulum', 'QDPM', 'Sarpra', 'Tata Usaha'].map(dept => (
+                        <option key={dept} value={dept}>{dept}</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               )}

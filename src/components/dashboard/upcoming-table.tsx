@@ -20,7 +20,7 @@ export default function UpcomingTable() {
       const { data } = await supabase
         .from('schedules')
         .select(`
-          id, date, status, subject, class_name,
+          id, date, status, department,
           users!schedules_teacher_id_fkey(name)
         `)
         .eq('status', 'Terjadwal')
@@ -49,15 +49,14 @@ export default function UpcomingTable() {
           <thead>
             <tr>
               <th>Guru</th>
-              <th>Mata Pelajaran</th>
-              <th>Kelas</th>
+              <th>Bagian</th>
               <th>Tanggal</th>
             </tr>
           </thead>
           <tbody>
             {schedules.length === 0 ? (
               <tr>
-                <td colSpan={4} className="text-center py-6 text-slate-500">
+                <td colSpan={3} className="text-center py-6 text-slate-500">
                   Tidak ada jadwal mendatang
                 </td>
               </tr>
@@ -69,10 +68,9 @@ export default function UpcomingTable() {
                       {schedule.users?.name}
                     </div>
                   </td>
-                  <td>{schedule.subject}</td>
                   <td>
                     <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-semibold rounded-md bg-slate-100 text-slate-700">
-                      {schedule.class_name}
+                      {schedule.department}
                     </span>
                   </td>
                   <td>

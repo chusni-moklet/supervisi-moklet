@@ -17,7 +17,7 @@ export default function DataSupervisiTable() {
       const { data, error } = await supabase
         .from('observations')
         .select(`
-          id, subject, class_name, date, nilai, category,
+          id, department, date, nilai, category,
           teacher:users!observations_teacher_id_fkey(name),
           observer:users!observations_observer_id_fkey(name)
         `)
@@ -37,8 +37,8 @@ export default function DataSupervisiTable() {
     const q = searchQuery.toLowerCase();
     const teacherName = obs.teacher?.name?.toLowerCase() || '';
     const observerName = obs.observer?.name?.toLowerCase() || '';
-    const subject = obs.subject?.toLowerCase() || '';
-    return teacherName.includes(q) || observerName.includes(q) || subject.includes(q);
+    const department = obs.department?.toLowerCase() || '';
+    return teacherName.includes(q) || observerName.includes(q) || department.includes(q);
   });
 
   return (
@@ -54,7 +54,7 @@ export default function DataSupervisiTable() {
           <input
             type="text"
             className="input pl-10"
-            placeholder="Cari guru, observer, atau mapel..."
+            placeholder="Cari guru, observer, atau bagian..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
           />
@@ -71,8 +71,7 @@ export default function DataSupervisiTable() {
                 <tr>
                   <th>Tanggal</th>
                   <th>Guru</th>
-                  <th>Mata Pelajaran</th>
-                  <th>Kelas</th>
+                  <th>Bagian</th>
                   <th>Observer</th>
                   <th>Nilai</th>
                   <th>Kategori</th>
@@ -85,8 +84,7 @@ export default function DataSupervisiTable() {
                       {formatDateShort(obs.date)}
                     </td>
                     <td className="font-medium">{obs.teacher?.name}</td>
-                    <td>{obs.subject}</td>
-                    <td>{obs.class_name}</td>
+                    <td>{obs.department}</td>
                     <td className="text-slate-500">{obs.observer?.name}</td>
                     <td className="font-semibold">{obs.nilai}</td>
                     <td>

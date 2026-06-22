@@ -20,6 +20,7 @@ CREATE TABLE public.users (
   name TEXT NOT NULL,
   email TEXT UNIQUE NOT NULL,
   role user_role NOT NULL DEFAULT 'ADMIN',
+  department TEXT,
   avatar_url TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -58,8 +59,7 @@ CREATE TABLE public.observations (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   observer_id UUID REFERENCES public.users(id),
   teacher_id UUID REFERENCES public.teachers(id),
-  subject TEXT NOT NULL,
-  class_name TEXT NOT NULL,
+  department TEXT NOT NULL,
   date DATE NOT NULL,
   total_score INT NOT NULL DEFAULT 0,
   max_score INT NOT NULL DEFAULT 0,
@@ -82,8 +82,7 @@ CREATE TABLE public.schedules (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   teacher_id UUID REFERENCES public.teachers(id),
   observer_id UUID REFERENCES public.users(id),
-  subject TEXT NOT NULL,
-  class_name TEXT NOT NULL,
+  department TEXT NOT NULL,
   date DATE NOT NULL,
   status TEXT NOT NULL DEFAULT 'Terjadwal' CHECK (status IN ('Terjadwal', 'Selesai', 'Batal')),
   created_at TIMESTAMPTZ DEFAULT NOW()

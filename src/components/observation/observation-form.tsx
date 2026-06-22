@@ -125,8 +125,7 @@ export default function ObservationForm() {
       .insert([{
         observer_id: data.observerId,
         teacher_id: data.teacherId,
-        subject: selectedTeacher?.subject,
-        class_name: selectedTeacher?.class_name,
+        department: selectedTeacher?.department,
         date: data.date,
         total_score: totalScore,
         max_score: maxScore,
@@ -237,25 +236,13 @@ export default function ObservationForm() {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                    Mata Pelajaran
+                    Bagian
                   </label>
                   <input
-                    className="input bg-slate-50"
-                    value={selectedTeacher?.subject || ''}
                     readOnly
-                    placeholder="— Pilih guru terlebih dahulu"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                    Kelas
-                  </label>
-                  <input
-                    className="input bg-slate-50"
-                    value={selectedTeacher?.class_name || ''}
-                    readOnly
-                    placeholder="— Pilih guru terlebih dahulu"
+                    className="input bg-slate-50 cursor-not-allowed"
+                    value={selectedTeacher?.department || ''}
+                    placeholder="Pilih guru terlebih dahulu"
                   />
                 </div>
 

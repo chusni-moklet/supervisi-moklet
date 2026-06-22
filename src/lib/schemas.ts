@@ -21,9 +21,7 @@ export const userFormSchema = z.object({
   role: z.enum(['SUPER_ADMIN', 'KEPALA_SEKOLAH', 'ADMIN'], {
     message: 'Pilih role',
   }),
-  nip: z.string().optional(),
-  subject: z.string().optional(),
-  class_name: z.string().optional(),
+  department: z.enum(['Hubinkom', 'Kesiswaan', 'Kurikulum', 'QDPM', 'Sarpra', 'Tata Usaha']).optional(),
 });
 
 export type UserFormData = z.infer<typeof userFormSchema>;

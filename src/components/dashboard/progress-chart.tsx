@@ -25,21 +25,21 @@ export default function ProgressChart() {
 
   useEffect(() => {
     async function loadData() {
-      const { data: obs } = await supabase.from('observations').select('subject, nilai');
+      const { data: obs } = await supabase.from('observations').select('department, nilai');
       if (obs && obs.length > 0) {
-        const subjectMap: Record<string, { total: number; count: number }> = {};
-        for (const o of obs) {
-          if (!subjectMap[o.subject]) {
-            subjectMap[o.subject] = { total: 0, count: 0 };
+        const deptMap: Record<string, { total: number; count: number }> = {};
+        obs.forEach(o => {
+          if (!deptMap[o.department]) {
+            deptMap[o.department] = { total: 0, count: 0 };
           }
-          subjectMap[o.subject].total += Number(o.nilai);
-          subjectMap[o.subject].count += 1;
-        }
-        
-        const chartData = Object.entries(subjectMap).map(([subject, stats]) => ({
-          subject: subject.length > 10 ? subject.substring(0, 10) + '...' : subject,
+          deptMap[o.department].total += Number(o.nilai);
+          deptMap[o.department].count += 1;
+        });
+
+        const chartData = Object.entries(deptMap).map(([department, stats]) => ({
+          department: department.length > 15 ? department.substring(0, 15) + '...' : department,
           avgScore: Math.round(stats.total / stats.count),
-          fullSubject: subject
+          fullDepartment: department
         }));
         
         // Sort by score
@@ -53,7 +53,7 @@ export default function ProgressChart() {
   return (
     <div className="card p-5 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
       <h3 className="text-sm font-semibold text-slate-800 mb-4">
-        Rata-rata Nilai per Mata Pelajaran
+        Rata-rata Nilai per Departemen
       </h3>
       <div className="h-[280px]">
         <ResponsiveContainer width="100%" height="100%">
@@ -63,13 +63,11 @@ export default function ProgressChart() {
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
             <XAxis
-              dataKey="subject"
-              tick={{ fontSize: 11, fill: '#64748b' }}
+              dataKey="department"
+              axisLine={false}
               tickLine={false}
-              axisLine={{ stroke: '#e2e8f0' }}
-              angle={-25}
-              textAnchor="end"
-              height={60}
+              tick={{ fontSize: 11, fill: '#64748b' }}
+              dy={10}
             />
             <YAxis
               domain={[0, 100]}
@@ -78,14 +76,15 @@ export default function ProgressChart() {
               axisLine={false}
             />
             <Tooltip
-              contentStyle={{
-                borderRadius: '10px',
-                border: '1px solid #e2e8f0',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-                fontSize: '13px',
+              cursor={{ fill: '#f1f5f9' }}
+              contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+              labelFormatter={(label, payload) => {
+                if (payload && payload.length > 0) {
+                  return payload[0].payload.fullDepartment;
+                }
+                return label;
               }}
               formatter={(value: any) => [`${value}`, 'Rata-rata Nilai']}
-              cursor={{ fill: 'rgba(37, 99, 235, 0.05)' }}
             />
             <Bar dataKey="avgScore" radius={[6, 6, 0, 0]} barSize={32}>
               {data.map((entry, index) => (

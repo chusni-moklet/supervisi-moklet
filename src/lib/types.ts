@@ -6,17 +6,13 @@ export interface User {
   email: string;
   role: Role;
   avatar?: string;
-  nip?: string;
-  subject?: string;
-  class_name?: string;
+  department?: string;
 }
 
 export interface Teacher {
   id: string;
   name: string;
-  nip: string;
-  subject: string;
-  className: string;
+  department: string;
 }
 
 export interface IndicatorCategory {
@@ -45,8 +41,7 @@ export interface Observation {
   observerName: string;
   teacherId: string;
   teacherName: string;
-  subject: string;
-  className: string;
+  department: string;
   date: string;
   scores: ObservationScore[];
   totalScore: number;
@@ -64,8 +59,7 @@ export interface Schedule {
   id: string;
   teacherId: string;
   teacherName: string;
-  subject: string;
-  className: string;
+  department: string;
   observerId: string;
   observerName: string;
   date: string;
