@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import AppShell from '@/components/layout/app-shell';
-import ObservationForm from '@/components/observation/observation-form';
-import { useAuth } from '@/lib/auth-context';
-import { ShieldAlert } from 'lucide-react';
+import AppShell from "@/components/layout/app-shell";
+import ObservationForm from "@/components/observation/observation-form";
+import { useAuth } from "@/lib/auth-context";
+import { ShieldAlert } from "lucide-react";
 
 export default function ObservasiPage() {
   const { hasPermission } = useAuth();
 
-  if (!hasPermission('create_observation')) {
+  if (!hasPermission("create_observation")) {
     return (
       <AppShell>
         <div className="flex flex-col items-center justify-center py-20 animate-fade-in">

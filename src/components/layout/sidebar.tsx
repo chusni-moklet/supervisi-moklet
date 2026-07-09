@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   ClipboardList,
@@ -11,10 +11,10 @@ import {
   X,
   GraduationCap,
   FileText,
-} from 'lucide-react';
-import { useAuth } from '@/lib/auth-context';
-import { cn } from '@/lib/utils';
-import { ROLE_LABELS } from '@/lib/types';
+} from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
+import { cn } from "@/lib/utils";
+import { ROLE_LABELS } from "@/lib/types";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -23,34 +23,34 @@ interface SidebarProps {
 
 const NAV_ITEMS = [
   {
-    href: '/',
-    label: 'Dashboard',
+    href: "/",
+    label: "Dashboard",
     icon: LayoutDashboard,
     permissions: [] as string[], // accessible by all
   },
   {
-    href: '/data-supervisi',
-    label: 'Data Supervisi',
+    href: "/data-supervisi",
+    label: "Data Supervisi",
     icon: FileText,
-    permissions: ['view_all_observations'],
+    permissions: ["view_all_observations"],
   },
   {
-    href: '/observasi',
-    label: 'Form Observasi',
+    href: "/observasi",
+    label: "Form Observasi",
     icon: ClipboardList,
-    permissions: ['create_observation'],
+    permissions: ["create_observation"],
   },
   {
-    href: '/aspek-indikator',
-    label: 'Aspek & Indikator',
+    href: "/aspek-indikator",
+    label: "Aspek & Indikator",
     icon: ListChecks,
-    permissions: ['manage_indicators'],
+    permissions: ["manage_indicators"],
   },
   {
-    href: '/manajemen-user',
-    label: 'Manajemen User',
+    href: "/manajemen-user",
+    label: "Manajemen User",
     icon: Users,
-    permissions: ['manage_users'],
+    permissions: ["manage_users"],
   },
 ];
 
@@ -60,9 +60,9 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   if (!currentUser) return null;
 
-  const filteredNav = NAV_ITEMS.filter(item => {
+  const filteredNav = NAV_ITEMS.filter((item) => {
     if (item.permissions.length === 0) return true;
-    return item.permissions.some(p => hasPermission(p as never));
+    return item.permissions.some((p) => hasPermission(p as never));
   });
 
   return (
@@ -80,11 +80,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       <aside
         id="sidebar"
         className={cn(
-          'fixed top-0 left-0 h-full z-50 lg:z-30 transition-transform duration-300 ease-in-out',
-          'lg:translate-x-0',
-          isOpen ? 'translate-x-0' : '-translate-x-full',
+          "fixed top-0 left-0 h-full z-50 lg:z-30 transition-transform duration-300 ease-in-out",
+          "lg:translate-x-0",
+          isOpen ? "translate-x-0" : "-translate-x-full",
         )}
-        style={{ width: 'var(--sidebar-width)' }}
+        style={{ width: "var(--sidebar-width)" }}
       >
         <div className="h-full flex flex-col bg-white border-r border-slate-200 shadow-lg lg:shadow-none">
           {/* Brand Header */}
@@ -117,10 +117,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <p className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
               Menu
             </p>
-            {filteredNav.map(item => {
+            {filteredNav.map((item) => {
               const isActive =
                 pathname === item.href ||
-                (item.href !== '/' && pathname.startsWith(item.href));
+                (item.href !== "/" && pathname.startsWith(item.href));
               const Icon = item.icon;
 
               return (
@@ -128,18 +128,18 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   key={item.href}
                   href={item.href}
                   onClick={onClose}
-                  id={`nav-${item.href.replace('/', '') || 'dashboard'}`}
+                  id={`nav-${item.href.replace("/", "") || "dashboard"}`}
                   className={cn(
-                    'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200',
+                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
                     isActive
-                      ? 'bg-blue-50 text-tech-blue shadow-sm'
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-800',
+                      ? "bg-blue-50 text-tech-blue shadow-sm"
+                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-800",
                   )}
                 >
                   <Icon
                     className={cn(
-                      'w-[18px] h-[18px] flex-shrink-0',
-                      isActive ? 'text-tech-blue' : 'text-slate-400',
+                      "w-[18px] h-[18px] flex-shrink-0",
+                      isActive ? "text-tech-blue" : "text-slate-400",
                     )}
                   />
                   {item.label}

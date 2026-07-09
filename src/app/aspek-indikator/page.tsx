@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import AppShell from '@/components/layout/app-shell';
-import IndicatorManagement from '@/components/indicators/indicator-management';
-import { useAuth } from '@/lib/auth-context';
-import { ShieldAlert } from 'lucide-react';
+import AppShell from "@/components/layout/app-shell";
+import IndicatorManagement from "@/components/indicators/indicator-management";
+import { useAuth } from "@/lib/auth-context";
+import { ShieldAlert } from "lucide-react";
 
 export default function AspekIndikatorPage() {
   const { hasPermission } = useAuth();
 
-  if (!hasPermission('manage_indicators')) {
+  if (!hasPermission("manage_indicators")) {
     return (
       <AppShell>
         <div className="flex flex-col items-center justify-center py-20 animate-fade-in">

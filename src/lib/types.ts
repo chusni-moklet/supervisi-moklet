@@ -1,4 +1,4 @@
-export type Role = 'SUPER_ADMIN' | 'KEPALA_SEKOLAH' | 'ADMIN';
+export type Role = "SUPER_ADMIN" | "KEPALA_SEKOLAH" | "ADMIN" | "GURU";
 
 export interface User {
   id: string;
@@ -7,6 +7,8 @@ export interface User {
   role: Role;
   avatar?: string;
   department?: string;
+  mapel?: string;
+  kelas?: string;
 }
 
 export interface Teacher {
@@ -51,9 +53,9 @@ export interface Observation {
   createdAt: string;
 }
 
-export type ScoreCategory = 'Sangat Baik' | 'Baik' | 'Cukup' | 'Kurang';
+export type ScoreCategory = "Sangat Baik" | "Baik" | "Cukup" | "Kurang";
 
-export type ScheduleStatus = 'Terjadwal' | 'Selesai' | 'Batal';
+export type ScheduleStatus = "Terjadwal" | "Selesai" | "Batal";
 
 export interface Schedule {
   id: string;
@@ -74,45 +76,47 @@ export interface DashboardStats {
 }
 
 export type Permission =
-  | 'view_dashboard'
-  | 'view_all_observations'
-  | 'view_own_observations'
-  | 'create_observation'
-  | 'manage_indicators'
-  | 'manage_schedules'
-  | 'manage_users';
+  | "view_dashboard"
+  | "view_all_observations"
+  | "view_own_observations"
+  | "create_observation"
+  | "manage_indicators"
+  | "manage_schedules"
+  | "manage_users";
 
 export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   SUPER_ADMIN: [
-    'view_dashboard',
-    'view_all_observations',
-    'view_own_observations',
-    'create_observation',
-    'manage_indicators',
-    'manage_schedules',
-    'manage_users',
+    "view_dashboard",
+    "view_all_observations",
+    "view_own_observations",
+    "create_observation",
+    "manage_indicators",
+    "manage_schedules",
+    "manage_users",
   ],
   KEPALA_SEKOLAH: [
-    'view_dashboard',
-    'view_all_observations',
-    'view_own_observations',
-    'create_observation',
-    'manage_indicators',
-    'manage_schedules',
-    'manage_users',
+    "view_dashboard",
+    "view_all_observations",
+    "view_own_observations",
+    "create_observation",
+    "manage_indicators",
+    "manage_schedules",
+    "manage_users",
   ],
   ADMIN: [
-    'view_dashboard',
-    'view_all_observations',
-    'view_own_observations',
-    'create_observation',
-    'manage_indicators',
-    'manage_schedules',
+    "view_dashboard",
+    "view_all_observations",
+    "view_own_observations",
+    "create_observation",
+    "manage_indicators",
+    "manage_schedules",
   ],
+  GURU: ["view_dashboard", "view_own_observations"],
 };
 
 export const ROLE_LABELS: Record<Role, string> = {
-  SUPER_ADMIN: 'Super Admin',
-  KEPALA_SEKOLAH: 'Kepala Sekolah',
-  ADMIN: 'Admin',
+  SUPER_ADMIN: "Super Admin",
+  KEPALA_SEKOLAH: "Kepala Sekolah",
+  ADMIN: "Admin",
+  GURU: "Guru",
 };

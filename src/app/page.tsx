@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import AppShell from '@/components/layout/app-shell';
-import StatsCards from '@/components/dashboard/stats-cards';
-import StatusChart from '@/components/dashboard/status-chart';
-import ProgressChart from '@/components/dashboard/progress-chart';
-import UpcomingTable from '@/components/dashboard/upcoming-table';
-import PageHeader from '@/components/ui/page-header';
-import { useAuth } from '@/lib/auth-context';
-import { supabase } from '@/lib/supabase';
-import ScoreBadge from '@/components/ui/score-badge';
-import { formatDateShort } from '@/lib/utils';
-import { ClipboardList, TrendingUp } from 'lucide-react';
+import { useState, useEffect } from "react";
+import AppShell from "@/components/layout/app-shell";
+import StatsCards from "@/components/dashboard/stats-cards";
+import StatusChart from "@/components/dashboard/status-chart";
+import ProgressChart from "@/components/dashboard/progress-chart";
+import UpcomingTable from "@/components/dashboard/upcoming-table";
+import PageHeader from "@/components/ui/page-header";
+import { useAuth } from "@/lib/auth-context";
+import { supabase } from "@/lib/supabase";
+import ScoreBadge from "@/components/ui/score-badge";
+import { formatDateShort } from "@/lib/utils";
+import { ClipboardList, TrendingUp } from "lucide-react";
 
 function GuruDashboard() {
   const { currentUser } = useAuth();
@@ -22,17 +22,19 @@ function GuruDashboard() {
   useEffect(() => {
     async function loadObs() {
       if (!currentUser) return;
-      
+
       const { data } = await supabase
-        .from('observations')
-        .select(`
+        .from("observations")
+        .select(
+          `
           id, subject, class_name, date, nilai, category,
           teachers!inner(name),
           users!inner(name)
-        `)
-        .eq('teachers.name', currentUser.name)
-        .order('date', { ascending: false });
-        
+        `,
+        )
+        .eq("teachers.name", currentUser.name)
+        .order("date", { ascending: false });
+
       if (data) setMyObservations(data);
       setLoading(false);
     }
@@ -51,7 +53,9 @@ function GuruDashboard() {
         <div className="card card-interactive p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-500 font-medium">Total Observasi</p>
+              <p className="text-sm text-slate-500 font-medium">
+                Total Observasi
+              </p>
               <p className="text-3xl font-bold text-slate-800 mt-1">
                 {myObservations.length}
               </p>
@@ -64,14 +68,16 @@ function GuruDashboard() {
         <div className="card card-interactive p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-500 font-medium">Rata-rata Nilai</p>
+              <p className="text-sm text-slate-500 font-medium">
+                Rata-rata Nilai
+              </p>
               <p className="text-3xl font-bold text-slate-800 mt-1">
                 {myObservations.length > 0
                   ? Math.round(
                       myObservations.reduce((a, b) => a + b.nilai, 0) /
                         myObservations.length,
                     )
-                  : '-'}
+                  : "-"}
               </p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center">
@@ -82,7 +88,10 @@ function GuruDashboard() {
       </div>
 
       {/* My Observation Results */}
-      <div className="card overflow-hidden animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+      <div
+        className="card overflow-hidden animate-fade-in-up"
+        style={{ animationDelay: "200ms" }}
+      >
         <div className="p-5 pb-0">
           <h3 className="text-sm font-semibold text-slate-800">
             Hasil Observasi Saya
@@ -102,7 +111,7 @@ function GuruDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {myObservations.map(obs => (
+                {myObservations.map((obs) => (
                   <tr key={obs.id}>
                     <td className="whitespace-nowrap font-medium">
                       {formatDateShort(obs.date)}

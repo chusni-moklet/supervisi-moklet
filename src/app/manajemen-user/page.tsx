@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import AppShell from '@/components/layout/app-shell';
-import UserManagementTable from '@/components/users/user-management-table';
-import { useAuth } from '@/lib/auth-context';
-import { ShieldAlert } from 'lucide-react';
+import AppShell from "@/components/layout/app-shell";
+import UserManagementTable from "@/components/users/user-management-table";
+import { useAuth } from "@/lib/auth-context";
+import { ShieldAlert } from "lucide-react";
 
 export default function ManajemenUserPage() {
   const { hasPermission } = useAuth();
 
-  if (!hasPermission('manage_users')) {
+  if (!hasPermission("manage_users")) {
     return (
       <AppShell>
         <div className="flex flex-col items-center justify-center py-20 animate-fade-in">

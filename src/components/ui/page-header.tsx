@@ -4,7 +4,11 @@ interface PageHeaderProps {
   actions?: React.ReactNode;
 }
 
-export default function PageHeader({ title, description, actions }: PageHeaderProps) {
+export default function PageHeader({
+  title,
+  description,
+  actions,
+}: PageHeaderProps) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
       <div>

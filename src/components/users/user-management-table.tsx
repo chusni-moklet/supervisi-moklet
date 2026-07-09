@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useState, useMemo, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
-import { type User, type Role, ROLE_LABELS } from '@/lib/types';
-import { useAuth } from '@/lib/auth-context';
-import RoleBadge from '@/components/ui/role-badge';
-import PageHeader from '@/components/ui/page-header';
-import { cn } from '@/lib/utils';
+import { useState, useMemo, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
+import { type User, type Role, ROLE_LABELS } from "@/lib/types";
+import { useAuth } from "@/lib/auth-context";
+import RoleBadge from "@/components/ui/role-badge";
+import PageHeader from "@/components/ui/page-header";
+import { cn } from "@/lib/utils";
 import {
   Search,
   UserPlus,
@@ -15,19 +15,22 @@ import {
   X,
   CheckCircle,
   AlertTriangle,
-} from 'lucide-react';
+} from "lucide-react";
 
-const ALL_ROLES: Role[] = ['SUPER_ADMIN', 'KEPALA_SEKOLAH', 'ADMIN'];
+const ALL_ROLES: Role[] = ["SUPER_ADMIN", "KEPALA_SEKOLAH", "ADMIN", "GURU"];
 
 export default function UserManagementTable() {
   const { currentUser } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Fetch users from Supabase
   const fetchUsers = async () => {
-    const { data, error } = await supabase.from('users').select('*').order('created_at', { ascending: false });
+    const { data, error } = await supabase
+      .from("users")
+      .select("*")
+      .order("created_at", { ascending: false });
     if (data) {
       setUsers(data as User[]);
     }
@@ -44,21 +47,22 @@ export default function UserManagementTable() {
   const [showToast, setShowToast] = useState<string | null>(null);
 
   // New user form state
-  const [newName, setNewName] = useState('');
-  const [newEmail, setNewEmail] = useState('');
-  const [newRole, setNewRole] = useState<Role>('ADMIN');
-  const [newDepartment, setNewDepartment] = useState('');
+  const [newName, setNewName] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [newRole, setNewRole] = useState<Role>("ADMIN");
+  const [newDepartment, setNewDepartment] = useState("");
+  const [newMapel, setNewMapel] = useState("");
+  const [newKelas, setNewKelas] = useState("");
 
   // Edit role state
-  const [editRole, setEditRole] = useState<Role>('ADMIN');
+  const [editRole, setEditRole] = useState<Role>("ADMIN");
 
   const filteredUsers = useMemo(() => {
     if (!searchQuery) return users;
     const q = searchQuery.toLowerCase();
     return users.filter(
-      u =>
-        u.name.toLowerCase().includes(q) ||
-        u.email.toLowerCase().includes(q),
+      (u) =>
+        u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q),
     );
   }, [users, searchQuery]);
 
@@ -69,14 +73,18 @@ export default function UserManagementTable() {
 
   const handleAddUser = async () => {
     if (!newName || !newEmail) return;
-    
+
     const newUserObj: any = { name: newName, email: newEmail, role: newRole };
-    if (newRole === 'ADMIN' && newDepartment) {
+    if (newRole === "ADMIN" && newDepartment) {
       newUserObj.department = newDepartment;
+    }
+    if (newRole === "GURU") {
+      if (newMapel) newUserObj.mapel = newMapel;
+      if (newKelas) newUserObj.kelas = newKelas;
     }
 
     const { data, error } = await supabase
-      .from('users')
+      .from("users")
       .insert([newUserObj])
       .select();
 
@@ -86,34 +94,34 @@ export default function UserManagementTable() {
     }
 
     if (data && data.length > 0) {
-      setUsers(prev => [data[0] as User, ...prev]);
+      setUsers((prev) => [data[0] as User, ...prev]);
       toast(`User "${newName}" berhasil ditambahkan`);
     }
 
     setAddingUser(false);
-    setNewName('');
-    setNewEmail('');
-    setNewRole('ADMIN');
-    setNewDepartment('');
+    setNewName("");
+    setNewEmail("");
+    setNewRole("ADMIN");
+    setNewDepartment("");
+    setNewMapel("");
+    setNewKelas("");
   };
 
   const handleChangeRole = async () => {
     if (!editingUser) return;
 
     const { error } = await supabase
-      .from('users')
+      .from("users")
       .update({ role: editRole })
-      .eq('id', editingUser.id);
+      .eq("id", editingUser.id);
 
     if (error) {
       toast(`Error: ${error.message}`);
       return;
     }
 
-    setUsers(prev =>
-      prev.map(u =>
-        u.id === editingUser.id ? { ...u, role: editRole } : u,
-      ),
+    setUsers((prev) =>
+      prev.map((u) => (u.id === editingUser.id ? { ...u, role: editRole } : u)),
     );
     toast(`Role "${editingUser.name}" diubah menjadi ${ROLE_LABELS[editRole]}`);
     setEditingUser(null);
@@ -123,16 +131,16 @@ export default function UserManagementTable() {
     if (!deletingUser) return;
 
     const { error } = await supabase
-      .from('users')
+      .from("users")
       .delete()
-      .eq('id', deletingUser.id);
+      .eq("id", deletingUser.id);
 
     if (error) {
       toast(`Error: ${error.message}`);
       return;
     }
 
-    setUsers(prev => prev.filter(u => u.id !== deletingUser.id));
+    setUsers((prev) => prev.filter((u) => u.id !== deletingUser.id));
     toast(`User "${deletingUser.name}" berhasil dihapus`);
     setDeletingUser(null);
   };
@@ -143,7 +151,7 @@ export default function UserManagementTable() {
         title="Manajemen User"
         description="Kelola akun pengguna dan role akses"
         actions={
-          currentUser?.role === 'SUPER_ADMIN' && (
+          currentUser?.role === "SUPER_ADMIN" && (
             <button
               onClick={() => setAddingUser(true)}
               id="btn-add-user"
@@ -166,80 +174,89 @@ export default function UserManagementTable() {
             className="input pl-10"
             placeholder="Cari nama atau email..."
             value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
       </div>
 
       {/* Table */}
       {!isLoaded ? (
-        <div className="card p-8 text-center text-slate-500 animate-pulse">Memuat data...</div>
-      ) : (
-      <div className="card overflow-hidden animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-        <div className="overflow-x-auto">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th style={{ width: 50 }}>No</th>
-                <th>Nama</th>
-                <th>Email</th>
-                <th>Bagian</th>
-                <th>Role</th>
-                <th style={{ width: 140 }}>Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.map((user, idx) => (
-                <tr key={user.id}>
-                  <td className="font-medium text-slate-400">{idx + 1}</td>
-                  <td className="font-medium">{user.name}</td>
-                  <td className="text-slate-500">{user.email}</td>
-                  <td className="text-sm text-slate-600">
-                    {user.role === 'ADMIN' && user.department ? user.department : <span className="text-slate-300">-</span>}
-                  </td>
-                  <td>
-                    <RoleBadge role={user.role} />
-                  </td>
-                  <td>
-                    <div className="flex items-center gap-1">
-                      {currentUser?.role === 'SUPER_ADMIN' && (
-                        <>
-                          <button
-                            onClick={() => {
-                              setEditingUser(user);
-                              setEditRole(user.role);
-                            }}
-                            id={`btn-edit-${user.id}`}
-                            className="btn btn-ghost btn-sm text-blue-600 hover:bg-blue-50"
-                            title="Ubah Role"
-                          >
-                            <Pencil className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => setDeletingUser(user)}
-                            id={`btn-delete-${user.id}`}
-                            className="btn btn-ghost btn-sm text-red-500 hover:bg-red-50"
-                            title="Hapus"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {filteredUsers.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="text-center py-8 text-slate-400">
-                    Tidak ada user ditemukan
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+        <div className="card p-8 text-center text-slate-500 animate-pulse">
+          Memuat data...
         </div>
-      </div>
+      ) : (
+        <div
+          className="card overflow-hidden animate-fade-in-up"
+          style={{ animationDelay: "100ms" }}
+        >
+          <div className="overflow-x-auto">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th style={{ width: 50 }}>No</th>
+                  <th>Nama</th>
+                  <th>Email</th>
+                  <th>Bagian</th>
+                  <th>Role</th>
+                  <th style={{ width: 140 }}>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredUsers.map((user, idx) => (
+                  <tr key={user.id}>
+                    <td className="font-medium text-slate-400">{idx + 1}</td>
+                    <td className="font-medium">{user.name}</td>
+                    <td className="text-slate-500">{user.email}</td>
+                    <td className="text-sm text-slate-600">
+                      {user.role === "ADMIN" && user.department ? (
+                        user.department
+                      ) : (
+                        <span className="text-slate-300">-</span>
+                      )}
+                    </td>
+                    <td>
+                      <RoleBadge role={user.role} />
+                    </td>
+                    <td>
+                      <div className="flex items-center gap-1">
+                        {currentUser?.role === "SUPER_ADMIN" && (
+                          <>
+                            <button
+                              onClick={() => {
+                                setEditingUser(user);
+                                setEditRole(user.role);
+                              }}
+                              id={`btn-edit-${user.id}`}
+                              className="btn btn-ghost btn-sm text-blue-600 hover:bg-blue-50"
+                              title="Ubah Role"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => setDeletingUser(user)}
+                              id={`btn-delete-${user.id}`}
+                              className="btn btn-ghost btn-sm text-red-500 hover:bg-red-50"
+                              title="Hapus"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {filteredUsers.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="text-center py-8 text-slate-400">
+                      Tidak ada user ditemukan
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
 
       {/* ── Add User Modal ───────────────────── */}
@@ -268,7 +285,7 @@ export default function UserManagementTable() {
                   className="input"
                   placeholder="Masukkan nama lengkap"
                   value={newName}
-                  onChange={e => setNewName(e.target.value)}
+                  onChange={(e) => setNewName(e.target.value)}
                 />
               </div>
               <div>
@@ -281,7 +298,7 @@ export default function UserManagementTable() {
                   className="input"
                   placeholder="email@smktelkom-mlg.sch.id"
                   value={newEmail}
-                  onChange={e => setNewEmail(e.target.value)}
+                  onChange={(e) => setNewEmail(e.target.value)}
                 />
               </div>
               <div>
@@ -292,9 +309,9 @@ export default function UserManagementTable() {
                   id="select-new-role"
                   className="input select"
                   value={newRole}
-                  onChange={e => setNewRole(e.target.value as Role)}
+                  onChange={(e) => setNewRole(e.target.value as Role)}
                 >
-                  {ALL_ROLES.map(role => (
+                  {ALL_ROLES.map((role) => (
                     <option key={role} value={role}>
                       {ROLE_LABELS[role]}
                     </option>
@@ -302,9 +319,11 @@ export default function UserManagementTable() {
                 </select>
               </div>
 
-              {newRole === 'ADMIN' && (
+              {newRole === "ADMIN" && (
                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-3 animate-fade-in-up">
-                  <h4 className="text-xs font-semibold text-slate-500 uppercase">Informasi Tambahan (Opsional)</h4>
+                  <h4 className="text-xs font-semibold text-slate-500 uppercase">
+                    Informasi Tambahan (Opsional)
+                  </h4>
                   <div>
                     <label className="block text-xs font-medium text-slate-600 mb-1">
                       Bagian
@@ -312,13 +331,52 @@ export default function UserManagementTable() {
                     <select
                       className="input select text-sm py-1.5 px-3"
                       value={newDepartment}
-                      onChange={e => setNewDepartment(e.target.value)}
+                      onChange={(e) => setNewDepartment(e.target.value)}
                     >
                       <option value="">Pilih Bagian</option>
-                      {['Hubinkom', 'Kesiswaan', 'Kurikulum', 'QDPM', 'Sarpra', 'Tata Usaha'].map(dept => (
-                        <option key={dept} value={dept}>{dept}</option>
+                      {[
+                        "Hubinkom",
+                        "Kesiswaan",
+                        "Kurikulum",
+                        "QDPM",
+                        "Sarpra",
+                        "Tata Usaha",
+                      ].map((dept) => (
+                        <option key={dept} value={dept}>
+                          {dept}
+                        </option>
                       ))}
                     </select>
+                  </div>
+                </div>
+              )}
+
+              {newRole === "GURU" && (
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-3 animate-fade-in-up">
+                  <h4 className="text-xs font-semibold text-slate-500 uppercase">
+                    Informasi Tambahan (Opsional)
+                  </h4>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">
+                      Mapel
+                    </label>
+                    <input
+                      className="input text-sm py-1.5 px-3"
+                      placeholder="Masukkan Mapel"
+                      value={newMapel}
+                      onChange={(e) => setNewMapel(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">
+                      Kelas
+                    </label>
+                    <input
+                      className="input text-sm py-1.5 px-3"
+                      placeholder="Contoh: X RPL 1"
+                      value={newKelas}
+                      onChange={(e) => setNewKelas(e.target.value)}
+                    />
                   </div>
                 </div>
               )}
@@ -362,20 +420,20 @@ export default function UserManagementTable() {
               </button>
             </div>
             <p className="text-sm text-slate-500 mb-4">
-              Ubah role untuk{' '}
+              Ubah role untuk{" "}
               <span className="font-medium text-slate-700">
                 {editingUser.name}
               </span>
             </p>
             <div className="space-y-2 mb-5">
-              {ALL_ROLES.map(role => (
+              {ALL_ROLES.map((role) => (
                 <label
                   key={role}
                   className={cn(
-                    'flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all',
+                    "flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all",
                     editRole === role
-                      ? 'border-tech-blue bg-blue-50'
-                      : 'border-slate-200 hover:border-slate-300',
+                      ? "border-tech-blue bg-blue-50"
+                      : "border-slate-200 hover:border-slate-300",
                   )}
                 >
                   <input
@@ -386,7 +444,9 @@ export default function UserManagementTable() {
                     onChange={() => setEditRole(role)}
                     className="accent-tech-blue"
                   />
-                  <span className="text-sm font-medium">{ROLE_LABELS[role]}</span>
+                  <span className="text-sm font-medium">
+                    {ROLE_LABELS[role]}
+                  </span>
                 </label>
               ))}
             </div>
@@ -428,7 +488,7 @@ export default function UserManagementTable() {
               </div>
             </div>
             <p className="text-sm text-slate-600 mb-5">
-              Apakah Anda yakin ingin menghapus user{' '}
+              Apakah Anda yakin ingin menghapus user{" "}
               <span className="font-semibold">{deletingUser.name}</span>?
             </p>
             <div className="flex gap-2">

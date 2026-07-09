@@ -10,7 +10,8 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TYPE user_role AS ENUM (
   'SUPER_ADMIN',
   'KEPALA_SEKOLAH',
-  'ADMIN'
+  'ADMIN',
+  'GURU'
 );
 
 -- ── Users Table ───────────────────────────
@@ -21,6 +22,8 @@ CREATE TABLE public.users (
   email TEXT UNIQUE NOT NULL,
   role user_role NOT NULL DEFAULT 'ADMIN',
   department TEXT,
+  mapel TEXT,
+  kelas TEXT,
   avatar_url TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()

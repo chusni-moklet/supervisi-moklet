@@ -1,44 +1,50 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
-import { formatDateShort } from '@/lib/utils';
-import ScoreBadge from '@/components/ui/score-badge';
-import PageHeader from '@/components/ui/page-header';
-import { Search } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
+import { formatDateShort } from "@/lib/utils";
+import ScoreBadge from "@/components/ui/score-badge";
+import PageHeader from "@/components/ui/page-header";
+import { Search } from "lucide-react";
 
 export default function DataSupervisiTable() {
   const [observations, setObservations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     async function loadData() {
       const { data, error } = await supabase
-        .from('observations')
-        .select(`
+        .from("observations")
+        .select(
+          `
           id, department, date, nilai, category,
           teacher:users!observations_teacher_id_fkey(name),
           observer:users!observations_observer_id_fkey(name)
-        `)
-        .order('date', { ascending: false });
-        
+        `,
+        )
+        .order("date", { ascending: false });
+
       if (error) {
-        console.error('Error fetching observations:', error);
+        console.error("Error fetching observations:", error);
       }
-        
+
       if (data) setObservations(data);
       setLoading(false);
     }
     loadData();
   }, []);
 
-  const filteredData = observations.filter(obs => {
+  const filteredData = observations.filter((obs) => {
     const q = searchQuery.toLowerCase();
-    const teacherName = obs.teacher?.name?.toLowerCase() || '';
-    const observerName = obs.observer?.name?.toLowerCase() || '';
-    const department = obs.department?.toLowerCase() || '';
-    return teacherName.includes(q) || observerName.includes(q) || department.includes(q);
+    const teacherName = obs.teacher?.name?.toLowerCase() || "";
+    const observerName = obs.observer?.name?.toLowerCase() || "";
+    const department = obs.department?.toLowerCase() || "";
+    return (
+      teacherName.includes(q) ||
+      observerName.includes(q) ||
+      department.includes(q)
+    );
   });
 
   return (
@@ -56,14 +62,19 @@ export default function DataSupervisiTable() {
             className="input pl-10"
             placeholder="Cari guru, observer, atau bagian..."
             value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
       </div>
 
-      <div className="card overflow-hidden animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+      <div
+        className="card overflow-hidden animate-fade-in-up"
+        style={{ animationDelay: "100ms" }}
+      >
         {loading ? (
-          <div className="p-8 text-center text-slate-500 animate-pulse">Memuat data...</div>
+          <div className="p-8 text-center text-slate-500 animate-pulse">
+            Memuat data...
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="data-table">
@@ -78,7 +89,7 @@ export default function DataSupervisiTable() {
                 </tr>
               </thead>
               <tbody>
-                {filteredData.map(obs => (
+                {filteredData.map((obs) => (
                   <tr key={obs.id}>
                     <td className="whitespace-nowrap font-medium">
                       {formatDateShort(obs.date)}

@@ -1,27 +1,36 @@
-'use client';
+"use client";
 
-import { useState, useMemo, useCallback, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useState, useMemo, useCallback, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   type ObservationHeaderData,
   observationHeaderSchema,
-} from '@/lib/schemas';
-import { supabase } from '@/lib/supabase';
-import { type ScoreValue, type User, type IndicatorCategory, type Indicator } from '@/lib/types';
-import { getScoreCategory, getScoreCategoryColor, cn } from '@/lib/utils';
-import PageHeader from '@/components/ui/page-header';
-import ScoreBadge from '@/components/ui/score-badge';
-import { Save, RotateCcw, CheckCircle } from 'lucide-react';
+} from "@/lib/schemas";
+import { supabase } from "@/lib/supabase";
+import {
+  type ScoreValue,
+  type User,
+  type IndicatorCategory,
+  type Indicator,
+} from "@/lib/types";
+import { getScoreCategory, getScoreCategoryColor, cn } from "@/lib/utils";
+import PageHeader from "@/components/ui/page-header";
+import ScoreBadge from "@/components/ui/score-badge";
+import { Save, RotateCcw, CheckCircle } from "lucide-react";
 
 const SCORE_OPTIONS = [
-  { value: 0 as ScoreValue, label: 'TIDAK TERLIHAT', cssClass: 'selected-0' },
+  { value: 0 as ScoreValue, label: "TIDAK TERLIHAT", cssClass: "selected-0" },
   {
     value: 1 as ScoreValue,
-    label: 'TERLIHAT tetapi kurang/tidak sesuai',
-    cssClass: 'selected-1',
+    label: "TERLIHAT tetapi kurang/tidak sesuai",
+    cssClass: "selected-1",
   },
-  { value: 2 as ScoreValue, label: 'TERLIHAT dan SESUAI', cssClass: 'selected-2' },
+  {
+    value: 2 as ScoreValue,
+    label: "TERLIHAT dan SESUAI",
+    cssClass: "selected-2",
+  },
 ];
 
 export default function ObservationForm() {
@@ -39,25 +48,30 @@ export default function ObservationForm() {
   useEffect(() => {
     const fetchData = async () => {
       const [userRes, catRes, indRes, teachRes] = await Promise.all([
-        supabase.from('users').select('*').in('role', ['SUPER_ADMIN', 'ADMIN', 'KEPALA_SEKOLAH']),
-        supabase.from('indicator_categories').select('*').order('sort_order'),
-        supabase.from('indicators').select('*').order('number'),
-        supabase.from('users').select('*').eq('role', 'ADMIN')
+        supabase
+          .from("users")
+          .select("*")
+          .in("role", ["SUPER_ADMIN", "ADMIN", "KEPALA_SEKOLAH"]),
+        supabase.from("indicator_categories").select("*").order("sort_order"),
+        supabase.from("indicators").select("*").order("number"),
+        supabase.from("users").select("*").eq("role", "ADMIN"),
       ]);
 
       if (userRes.data) setUsers(userRes.data as User[]);
       if (teachRes.data) setTeachers(teachRes.data as User[]);
       if (catRes.data && indRes.data) {
         setAllIndicators(indRes.data as Indicator[]);
-        const merged = catRes.data.map(cat => ({
+        const merged = catRes.data.map((cat) => ({
           id: cat.id,
           name: cat.name,
-          indicators: indRes.data.filter((i: any) => i.category_id === cat.id).map((i: any) => ({
-            id: i.id,
-            categoryId: i.category_id,
-            number: i.number,
-            text: i.text
-          }))
+          indicators: indRes.data
+            .filter((i: any) => i.category_id === cat.id)
+            .map((i: any) => ({
+              id: i.id,
+              categoryId: i.category_id,
+              number: i.number,
+              text: i.text,
+            })),
         }));
         setCategories(merged);
       }
@@ -76,8 +90,8 @@ export default function ObservationForm() {
     resolver: zodResolver(observationHeaderSchema),
   });
 
-  const selectedTeacherId = watch('teacherId');
-  const selectedTeacher = teachers.find(t => t.id === selectedTeacherId);
+  const selectedTeacherId = watch("teacherId");
+  const selectedTeacher = teachers.find((t) => t.id === selectedTeacherId);
 
   // Admins and super admins who can observe
   const observers = users;
@@ -105,7 +119,7 @@ export default function ObservationForm() {
 
   const handleScoreChange = useCallback(
     (indicatorId: string, value: ScoreValue) => {
-      setScores(prev => ({ ...prev, [indicatorId]: value }));
+      setScores((prev) => ({ ...prev, [indicatorId]: value }));
     },
     [],
   );
@@ -118,20 +132,22 @@ export default function ObservationForm() {
 
   const onSubmit = async (data: ObservationHeaderData) => {
     if (answeredCount < totalIndicators) return;
-    
+
     // Simpan ke Supabase
     const { data: obsData, error: obsErr } = await supabase
-      .from('observations')
-      .insert([{
-        observer_id: data.observerId,
-        teacher_id: data.teacherId,
-        department: selectedTeacher?.department,
-        date: data.date,
-        total_score: totalScore,
-        max_score: maxScore,
-        nilai: nilai,
-        category: category
-      }])
+      .from("observations")
+      .insert([
+        {
+          observer_id: data.observerId,
+          teacher_id: data.teacherId,
+          department: selectedTeacher?.department,
+          date: data.date,
+          total_score: totalScore,
+          max_score: maxScore,
+          nilai: nilai,
+          category: category,
+        },
+      ])
       .select();
 
     if (obsErr) {
@@ -142,13 +158,17 @@ export default function ObservationForm() {
     if (obsData && obsData[0]) {
       const obsId = obsData[0].id;
       // Insert scores
-      const scoreInserts = Object.entries(scores).map(([indicatorId, value]) => ({
-        observation_id: obsId,
-        indicator_id: indicatorId,
-        value: value
-      }));
+      const scoreInserts = Object.entries(scores).map(
+        ([indicatorId, value]) => ({
+          observation_id: obsId,
+          indicator_id: indicatorId,
+          value: value,
+        }),
+      );
 
-      const { error: scoreErr } = await supabase.from('observation_scores').insert(scoreInserts);
+      const { error: scoreErr } = await supabase
+        .from("observation_scores")
+        .insert(scoreInserts);
       if (scoreErr) {
         alert(`Error: ${scoreErr.message}`);
       }
@@ -192,10 +212,10 @@ export default function ObservationForm() {
                   <select
                     id="observer-select"
                     className="input select"
-                    {...register('observerId')}
+                    {...register("observerId")}
                   >
                     <option value="">Pilih Observer</option>
-                    {observers.map(u => (
+                    {observers.map((u) => (
                       <option key={u.id} value={u.id}>
                         {u.name}
                       </option>
@@ -218,10 +238,10 @@ export default function ObservationForm() {
                   <select
                     id="teacher-select"
                     className="input select"
-                    {...register('teacherId')}
+                    {...register("teacherId")}
                   >
                     <option value="">Pilih Guru</option>
-                    {teachers.map(t => (
+                    {teachers.map((t) => (
                       <option key={t.id} value={t.id}>
                         {t.name}
                       </option>
@@ -241,7 +261,7 @@ export default function ObservationForm() {
                   <input
                     readOnly
                     className="input bg-slate-50 cursor-not-allowed"
-                    value={selectedTeacher?.department || ''}
+                    value={selectedTeacher?.department || ""}
                     placeholder="Pilih guru terlebih dahulu"
                   />
                 </div>
@@ -257,7 +277,7 @@ export default function ObservationForm() {
                     id="date-input"
                     type="date"
                     className="input"
-                    {...register('date')}
+                    {...register("date")}
                   />
                   {errors.date && (
                     <p className="text-xs text-red-500 mt-1">
@@ -270,76 +290,83 @@ export default function ObservationForm() {
 
             {/* Indicator Categories */}
             {!isLoaded ? (
-              <div className="card p-8 text-center text-slate-500 animate-pulse">Memuat Form Observasi...</div>
-            ) : categories.length === 0 ? (
-              <div className="card p-8 text-center text-slate-500">Belum ada aspek indikator di database.</div>
-            ) : categories.map((cat, catIdx) => (
-              <div
-                key={cat.id}
-                className="card p-5 animate-fade-in-up"
-                style={{ animationDelay: `${(catIdx + 1) * 100}ms` }}
-              >
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="w-8 h-8 rounded-lg gradient-blue flex items-center justify-center text-white text-sm font-bold">
-                    {String.fromCharCode(65 + catIdx)}
-                  </span>
-                  <h3 className="text-sm font-semibold text-slate-800">
-                    {cat.name}
-                  </h3>
-                </div>
-
-                <div className="space-y-4">
-                  {cat.indicators.map(indicator => (
-                    <div key={indicator.id} className="pb-4 border-b border-slate-100 last:border-0 last:pb-0">
-                      <p className="text-sm text-slate-700 mb-3">
-                        <span className="font-semibold text-tech-blue">
-                          {indicator.number}.
-                        </span>{' '}
-                        {indicator.text}
-                      </p>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                        {SCORE_OPTIONS.map(opt => {
-                          const isSelected =
-                            scores[indicator.id] === opt.value;
-                          return (
-                            <label
-                              key={opt.value}
-                              className={cn(
-                                'radio-option',
-                                isSelected && opt.cssClass,
-                              )}
-                            >
-                              <input
-                                type="radio"
-                                name={`score-${indicator.id}`}
-                                value={opt.value}
-                                checked={isSelected}
-                                onChange={() =>
-                                  handleScoreChange(indicator.id, opt.value)
-                                }
-                                disabled={submitted}
-                              />
-                              <span className="text-xs sm:text-sm font-medium">
-                                {opt.label}
-                              </span>
-                            </label>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              <div className="card p-8 text-center text-slate-500 animate-pulse">
+                Memuat Form Observasi...
               </div>
-            ))}
+            ) : categories.length === 0 ? (
+              <div className="card p-8 text-center text-slate-500">
+                Belum ada aspek indikator di database.
+              </div>
+            ) : (
+              categories.map((cat, catIdx) => (
+                <div
+                  key={cat.id}
+                  className="card p-5 animate-fade-in-up"
+                  style={{ animationDelay: `${(catIdx + 1) * 100}ms` }}
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="w-8 h-8 rounded-lg gradient-blue flex items-center justify-center text-white text-sm font-bold">
+                      {String.fromCharCode(65 + catIdx)}
+                    </span>
+                    <h3 className="text-sm font-semibold text-slate-800">
+                      {cat.name}
+                    </h3>
+                  </div>
+
+                  <div className="space-y-4">
+                    {cat.indicators.map((indicator) => (
+                      <div
+                        key={indicator.id}
+                        className="pb-4 border-b border-slate-100 last:border-0 last:pb-0"
+                      >
+                        <p className="text-sm text-slate-700 mb-3">
+                          <span className="font-semibold text-tech-blue">
+                            {indicator.number}.
+                          </span>{" "}
+                          {indicator.text}
+                        </p>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                          {SCORE_OPTIONS.map((opt) => {
+                            const isSelected =
+                              scores[indicator.id] === opt.value;
+                            return (
+                              <label
+                                key={opt.value}
+                                className={cn(
+                                  "radio-option",
+                                  isSelected && opt.cssClass,
+                                )}
+                              >
+                                <input
+                                  type="radio"
+                                  name={`score-${indicator.id}`}
+                                  value={opt.value}
+                                  checked={isSelected}
+                                  onChange={() =>
+                                    handleScoreChange(indicator.id, opt.value)
+                                  }
+                                  disabled={submitted}
+                                />
+                                <span className="text-xs sm:text-sm font-medium">
+                                  {opt.label}
+                                </span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))
+            )}
 
             {/* Submit Button (mobile) */}
             <div className="xl:hidden">
               <button
                 type="submit"
-                disabled={
-                  submitted || answeredCount < totalIndicators
-                }
+                disabled={submitted || answeredCount < totalIndicators}
                 id="btn-submit-observation-mobile"
                 className="btn btn-primary w-full"
               >
@@ -358,7 +385,10 @@ export default function ObservationForm() {
           {/* Right: Score Panel (sticky) */}
           <div className="hidden xl:block">
             <div className="sticky top-20">
-              <div className="card p-5 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+              <div
+                className="card p-5 animate-fade-in-up"
+                style={{ animationDelay: "300ms" }}
+              >
                 <h3 className="text-sm font-semibold text-slate-800 mb-4">
                   Hasil Penilaian
                 </h3>
@@ -366,11 +396,7 @@ export default function ObservationForm() {
                 {/* Circular Progress */}
                 <div className="flex justify-center mb-4">
                   <div className="relative">
-                    <svg
-                      width="120"
-                      height="120"
-                      className="circular-progress"
-                    >
+                    <svg width="120" height="120" className="circular-progress">
                       <circle
                         cx="60"
                         cy="60"
@@ -384,7 +410,7 @@ export default function ObservationForm() {
                         cy="60"
                         r="42"
                         fill="none"
-                        stroke={answeredCount > 0 ? categoryColor : '#e2e8f0'}
+                        stroke={answeredCount > 0 ? categoryColor : "#e2e8f0"}
                         strokeWidth="8"
                         strokeLinecap="round"
                         strokeDasharray={circumference}
@@ -393,7 +419,7 @@ export default function ObservationForm() {
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                       <span className="text-2xl font-bold text-slate-800">
-                        {answeredCount > 0 ? nilai : '—'}
+                        {answeredCount > 0 ? nilai : "—"}
                       </span>
                       <span className="text-[10px] text-slate-400 font-medium">
                         NILAI
@@ -429,9 +455,7 @@ export default function ObservationForm() {
                 {/* Submit */}
                 <button
                   type="submit"
-                  disabled={
-                    submitted || answeredCount < totalIndicators
-                  }
+                  disabled={submitted || answeredCount < totalIndicators}
                   id="btn-submit-observation"
                   className="btn btn-primary w-full mt-5"
                 >

@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Clock } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
-import { cn } from '@/lib/utils';
-import { type ScheduleStatus } from '@/lib/types';
+import { useState, useEffect } from "react";
+import { Clock } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { cn } from "@/lib/utils";
+import { type ScheduleStatus } from "@/lib/types";
 
 const STATUS_STYLES: Record<ScheduleStatus, string> = {
-  Terjadwal: 'bg-blue-100 text-blue-700',
-  Selesai: 'bg-emerald-100 text-emerald-700',
-  Batal: 'bg-red-100 text-red-700',
+  Terjadwal: "bg-blue-100 text-blue-700",
+  Selesai: "bg-emerald-100 text-emerald-700",
+  Batal: "bg-red-100 text-red-700",
 };
 
 export default function UpcomingTable() {
@@ -18,13 +18,15 @@ export default function UpcomingTable() {
   useEffect(() => {
     async function fetchSchedules() {
       const { data } = await supabase
-        .from('schedules')
-        .select(`
+        .from("schedules")
+        .select(
+          `
           id, date, status, department,
           users!schedules_teacher_id_fkey(name)
-        `)
-        .eq('status', 'Terjadwal')
-        .order('date', { ascending: true })
+        `,
+        )
+        .eq("status", "Terjadwal")
+        .order("date", { ascending: true })
         .limit(5);
 
       if (data) {
@@ -35,7 +37,10 @@ export default function UpcomingTable() {
   }, []);
 
   return (
-    <div className="card overflow-hidden animate-fade-in-up" style={{ animationDelay: '400ms' }}>
+    <div
+      className="card overflow-hidden animate-fade-in-up"
+      style={{ animationDelay: "400ms" }}
+    >
       <div className="p-5 pb-0">
         <h3 className="text-sm font-semibold text-slate-800">
           Jadwal Observasi
@@ -61,7 +66,7 @@ export default function UpcomingTable() {
                 </td>
               </tr>
             ) : (
-              schedules.map(schedule => (
+              schedules.map((schedule) => (
                 <tr key={schedule.id}>
                   <td>
                     <div className="font-medium text-slate-800">
@@ -76,10 +81,10 @@ export default function UpcomingTable() {
                   <td>
                     <div className="flex items-center text-tech-blue">
                       <Clock className="w-4 h-4 mr-1.5" />
-                      {new Date(schedule.date).toLocaleDateString('id-ID', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
+                      {new Date(schedule.date).toLocaleDateString("id-ID", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
                       })}
                     </div>
                   </td>

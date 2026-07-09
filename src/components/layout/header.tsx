@@ -1,22 +1,22 @@
-'use client';
+"use client";
 
-import { Menu, Bell, ChevronDown } from 'lucide-react';
-import { useAuth } from '@/lib/auth-context';
-import { type Role, ROLE_LABELS } from '@/lib/types';
-import { useState, useRef, useEffect } from 'react';
-import { cn } from '@/lib/utils';
+import { Menu, Bell, ChevronDown } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
+import { type Role, ROLE_LABELS } from "@/lib/types";
+import { useState, useRef, useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 interface HeaderProps {
   onMenuToggle: () => void;
   title: string;
 }
 
-const ROLES: Role[] = ['SUPER_ADMIN', 'KEPALA_SEKOLAH', 'ADMIN'];
+const ROLES: Role[] = ["SUPER_ADMIN", "KEPALA_SEKOLAH", "ADMIN"];
 
 const ROLE_COLORS: Record<Role, string> = {
-  SUPER_ADMIN: 'bg-red-100 text-red-700 border-red-200',
-  KEPALA_SEKOLAH: 'bg-purple-100 text-purple-700 border-purple-200',
-  ADMIN: 'bg-blue-100 text-blue-700 border-blue-200',
+  SUPER_ADMIN: "bg-red-100 text-red-700 border-red-200",
+  KEPALA_SEKOLAH: "bg-purple-100 text-purple-700 border-purple-200",
+  ADMIN: "bg-blue-100 text-blue-700 border-blue-200",
 };
 
 export default function Header({ onMenuToggle, title }: HeaderProps) {
@@ -26,12 +26,15 @@ export default function Header({ onMenuToggle, title }: HeaderProps) {
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setIsDropdownOpen(false);
       }
     }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   if (!currentUser) return null;
@@ -40,7 +43,7 @@ export default function Header({ onMenuToggle, title }: HeaderProps) {
     <header
       id="main-header"
       className="glass-header sticky top-0 z-20 flex items-center justify-between px-4 lg:px-6"
-      style={{ height: 'var(--header-height)' }}
+      style={{ height: "var(--header-height)" }}
     >
       {/* Left side */}
       <div className="flex items-center gap-4">
@@ -63,7 +66,7 @@ export default function Header({ onMenuToggle, title }: HeaderProps) {
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             id="btn-role-switcher"
             className={cn(
-              'badge border cursor-pointer transition-all duration-200 hover:shadow-sm flex items-center gap-1.5 py-1.5 px-3',
+              "badge border cursor-pointer transition-all duration-200 hover:shadow-sm flex items-center gap-1.5 py-1.5 px-3",
               ROLE_COLORS[currentUser.role],
             )}
           >
@@ -73,10 +76,12 @@ export default function Header({ onMenuToggle, title }: HeaderProps) {
             <span className="text-xs font-semibold">
               {ROLE_LABELS[currentUser.role]}
             </span>
-            <ChevronDown className={cn(
-              'w-3.5 h-3.5 transition-transform duration-200',
-              isDropdownOpen && 'rotate-180',
-            )} />
+            <ChevronDown
+              className={cn(
+                "w-3.5 h-3.5 transition-transform duration-200",
+                isDropdownOpen && "rotate-180",
+              )}
+            />
           </button>
 
           {isDropdownOpen && (
@@ -87,7 +92,7 @@ export default function Header({ onMenuToggle, title }: HeaderProps) {
               <p className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
                 Switch Role
               </p>
-              {ROLES.map(role => (
+              {ROLES.map((role) => (
                 <button
                   key={role}
                   onClick={() => {
@@ -96,16 +101,18 @@ export default function Header({ onMenuToggle, title }: HeaderProps) {
                   }}
                   id={`switch-role-${role.toLowerCase()}`}
                   className={cn(
-                    'w-full text-left px-3 py-2 text-sm flex items-center gap-2 transition-colors',
+                    "w-full text-left px-3 py-2 text-sm flex items-center gap-2 transition-colors",
                     currentUser.role === role
-                      ? 'bg-blue-50 text-tech-blue font-medium'
-                      : 'text-slate-600 hover:bg-slate-50',
+                      ? "bg-blue-50 text-tech-blue font-medium"
+                      : "text-slate-600 hover:bg-slate-50",
                   )}
                 >
                   <span
                     className={cn(
-                      'w-2 h-2 rounded-full flex-shrink-0',
-                      currentUser.role === role ? 'bg-tech-blue' : 'bg-slate-300',
+                      "w-2 h-2 rounded-full flex-shrink-0",
+                      currentUser.role === role
+                        ? "bg-tech-blue"
+                        : "bg-slate-300",
                     )}
                   />
                   {ROLE_LABELS[role]}

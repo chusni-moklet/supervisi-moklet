@@ -1,13 +1,26 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
-import { type User, type Role, type Permission, ROLE_PERMISSIONS } from './types';
-import { supabase } from './supabase';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+  type ReactNode,
+} from "react";
+import {
+  type User,
+  type Role,
+  type Permission,
+  ROLE_PERMISSIONS,
+} from "./types";
+import { supabase } from "./supabase";
 
 interface AuthContextType {
   currentUser: User | null;
   isAuthenticated: boolean;
-  loginWithGoogle: () => Promise<void>;
+  loginWithEmail: (email: string, password: string) => Promise<void>;
+  registerWithEmail: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   switchRole: (role: Role) => void;
   hasPermission: (permission: Permission) => boolean;
@@ -35,12 +48,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       const email = session.user.email;
-      
+
       // Domain restriction
-      if (!email?.endsWith('@smktelkom-mlg.sch.id')) {
+      if (!email?.endsWith("@smktelkom-mlg.sch.id")) {
         await supabase.auth.signOut();
         if (mounted) {
-          setAuthError('Gunakan email sekolah Anda (@smktelkom-mlg.sch.id).');
+          setAuthError("Gunakan email sekolah Anda (@smktelkom-mlg.sch.id).");
           setCurrentUser(null);
           setIsInitializing(false);
         }
@@ -48,21 +61,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       // Whitelist restriction & Auto-Register
-      let { data: users } = await supabase.from('users').select('*').eq('email', email);
-      
+      let { data: users } = await supabase
+        .from("users")
+        .select("*")
+        .eq("email", email);
+
       if (!users || users.length === 0) {
         // Auto-register user baru sebagai ADMIN
-        const newUserName = session.user.user_metadata?.full_name || email.split('@')[0];
-        const { data: newUser, error: insertError } = await supabase.from('users').insert([{
-          email: email,
-          name: newUserName,
-          role: 'ADMIN'
-        }]).select();
+        const newUserName =
+          session.user.user_metadata?.full_name || email.split("@")[0];
+        const { data: newUser, error: insertError } = await supabase
+          .from("users")
+          .insert([
+            {
+              email: email,
+              name: newUserName,
+              role: "ADMIN",
+            },
+          ])
+          .select();
 
         if (insertError || !newUser || newUser.length === 0) {
           await supabase.auth.signOut();
           if (mounted) {
-            setAuthError('Gagal membuat akun otomatis. Hubungi Admin.');
+            setAuthError("Gagal membuat akun otomatis. Hubungi Admin.");
             setCurrentUser(null);
             setIsInitializing(false);
           }
@@ -96,16 +118,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const loginWithGoogle = async () => {
+  const loginWithEmail = async (email: string, password: string) => {
     setAuthError(null);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/`,
-      },
+    if (!email?.endsWith("@smktelkom-mlg.sch.id")) {
+      setAuthError("Gunakan email sekolah Anda (@smktelkom-mlg.sch.id).");
+      return;
+    }
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
     if (error) {
       setAuthError(error.message);
+    }
+  };
+
+  const registerWithEmail = async (email: string, password: string) => {
+    setAuthError(null);
+    if (!email?.endsWith("@smktelkom-mlg.sch.id")) {
+      setAuthError("Gunakan email sekolah Anda (@smktelkom-mlg.sch.id).");
+      return;
+    }
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: email.split("@")[0],
+        },
+      }
+    });
+    if (error) {
+      setAuthError(error.message);
+    } else {
+      setAuthError("Silakan periksa email Anda untuk verifikasi.");
     }
   };
 
@@ -114,15 +160,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setCurrentUser(null);
   };
 
-  const switchRole = useCallback(async (role: Role) => {
-    if (!currentUser) return;
-    const { data: users } = await supabase.from('users').select('*').eq('role', role).limit(1);
-    if (users && users.length > 0) {
-      setCurrentUser(users[0] as User);
-    } else {
-      setCurrentUser({ ...currentUser, role });
-    }
-  }, [currentUser]);
+  const switchRole = useCallback(
+    async (role: Role) => {
+      if (!currentUser) return;
+      const { data: users } = await supabase
+        .from("users")
+        .select("*")
+        .eq("role", role)
+        .limit(1);
+      if (users && users.length > 0) {
+        setCurrentUser(users[0] as User);
+      } else {
+        setCurrentUser({ ...currentUser, role });
+      }
+    },
+    [currentUser],
+  );
 
   const hasPermission = useCallback(
     (permission: Permission): boolean => {
@@ -137,7 +190,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         currentUser,
         isAuthenticated: currentUser !== null,
-        loginWithGoogle,
+        loginWithEmail,
+        registerWithEmail,
         logout,
         switchRole,
         hasPermission,
@@ -153,7 +207,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }
