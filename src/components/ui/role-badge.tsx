@@ -5,6 +5,7 @@ const ROLE_STYLES: Record<Role, string> = {
   SUPER_ADMIN: "bg-red-100 text-red-700",
   KEPALA_SEKOLAH: "bg-purple-100 text-purple-700",
   ADMIN: "bg-blue-100 text-blue-700",
+  GURU: "bg-emerald-100 text-emerald-700",
 };
 
 interface RoleBadgeProps {
