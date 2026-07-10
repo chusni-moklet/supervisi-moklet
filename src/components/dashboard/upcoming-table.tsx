@@ -22,7 +22,7 @@ export default function UpcomingTable() {
         .select(
           `
           id, date, status, department,
-          users!schedules_teacher_id_fkey(name)
+          teachers(name)
         `,
         )
         .eq("status", "Terjadwal")
@@ -70,7 +70,7 @@ export default function UpcomingTable() {
                 <tr key={schedule.id}>
                   <td>
                     <div className="font-medium text-slate-800">
-                      {schedule.users?.name}
+                      {schedule.teachers?.name}
                     </div>
                   </td>
                   <td>

@@ -19,8 +19,8 @@ export default function DataSupervisiTable() {
         .select(
           `
           id, department, date, nilai, category,
-          teacher:users!observations_teacher_id_fkey(name),
-          observer:users!observations_observer_id_fkey(name)
+          teacher:teachers(name),
+          observer:users(name)
         `,
         )
         .order("date", { ascending: false });

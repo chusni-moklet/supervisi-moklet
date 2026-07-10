@@ -27,8 +27,8 @@ function GuruDashboard() {
         .from("observations")
         .select(
           `
-          id, subject, class_name, date, nilai, category,
-          teachers!inner(name),
+          id, date, nilai, category,
+          teachers!inner(name, subject, class_name),
           users!inner(name)
         `,
         )
@@ -116,8 +116,8 @@ function GuruDashboard() {
                     <td className="whitespace-nowrap font-medium">
                       {formatDateShort(obs.date)}
                     </td>
-                    <td>{obs.subject}</td>
-                    <td>{obs.class_name}</td>
+                    <td>{obs.teachers?.subject}</td>
+                    <td>{obs.teachers?.class_name}</td>
                     <td>{obs.users?.name}</td>
                     <td className="font-semibold">{obs.nilai}</td>
                     <td>
