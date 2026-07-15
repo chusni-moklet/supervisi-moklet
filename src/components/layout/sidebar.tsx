@@ -29,10 +29,10 @@ const NAV_ITEMS = [
     permissions: [] as string[], // accessible by all
   },
   {
-    href: "/data-supervisi",
-    label: "Data Supervisi",
-    icon: FileText,
-    permissions: ["view_all_observations"],
+    href: "/aspek-indikator",
+    label: "Aspek & Indikator",
+    icon: ListChecks,
+    permissions: ["manage_indicators"],
   },
   {
     href: "/observasi",
@@ -41,10 +41,10 @@ const NAV_ITEMS = [
     permissions: ["create_observation"],
   },
   {
-    href: "/aspek-indikator",
-    label: "Aspek & Indikator",
-    icon: ListChecks,
-    permissions: ["manage_indicators"],
+    href: "/data-supervisi",
+    label: "Data Supervisi",
+    icon: FileText,
+    permissions: ["view_all_observations"],
   },
   {
     href: "/manajemen-user",

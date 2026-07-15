@@ -91,7 +91,11 @@ export default function ObservationForm() {
   });
 
   const selectedTeacherId = watch("teacherId");
+  const observerId = watch("observerId");
+  const date = watch("date");
   const selectedTeacher = teachers.find((t) => t.id === selectedTeacherId);
+
+  const isHeaderComplete = Boolean(observerId && selectedTeacherId && date);
 
   // Admins and super admins who can observe
   const observers = users;
@@ -336,7 +340,9 @@ export default function ObservationForm() {
                                 className={cn(
                                   "radio-option",
                                   isSelected && opt.cssClass,
+                                  (!isHeaderComplete || submitted) && "opacity-50 cursor-not-allowed"
                                 )}
+                                title={!isHeaderComplete ? "Lengkapi Informasi Observasi terlebih dahulu" : ""}
                               >
                                 <input
                                   type="radio"
@@ -346,7 +352,7 @@ export default function ObservationForm() {
                                   onChange={() =>
                                     handleScoreChange(indicator.id, opt.value)
                                   }
-                                  disabled={submitted}
+                                  disabled={submitted || !isHeaderComplete}
                                 />
                                 <span className="text-xs sm:text-sm font-medium">
                                   {opt.label}
