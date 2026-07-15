@@ -11,6 +11,7 @@ export const observationHeaderSchema = z.object({
   observerId: z.string().min(1, "Pilih observer"),
   teacherId: z.string().min(1, "Pilih guru"),
   date: z.string().min(1, "Pilih tanggal"),
+  notes: z.string().min(1, "Rekomendasi wajib diisi"),
 });
 
 export type ObservationHeaderData = z.infer<typeof observationHeaderSchema>;

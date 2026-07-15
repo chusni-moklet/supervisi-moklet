@@ -75,10 +75,10 @@ export default function UserManagementTable() {
     if (!newName || !newEmail) return;
 
     const newUserObj: any = { name: newName, email: newEmail, role: newRole };
-    if (newRole === "ADMIN" && newDepartment) {
-      newUserObj.department = newDepartment;
+    if (newRole === "ADMIN") {
+      if (newDepartment) newUserObj.department = newDepartment;
     }
-    if (newRole === "GURU") {
+    if (newRole === "GURU" || newRole === "ADMIN") {
       if (newMapel) newUserObj.mapel = newMapel;
       if (newKelas) newUserObj.kelas = newKelas;
     }
@@ -196,7 +196,7 @@ export default function UserManagementTable() {
                   <th style={{ width: 50 }}>No</th>
                   <th>Nama</th>
                   <th>Email</th>
-                  <th>Bagian</th>
+                  <th>Mata Pelajaran / Bagian</th>
                   <th>Role</th>
                   <th style={{ width: 140 }}>Aksi</th>
                 </tr>
@@ -208,8 +208,8 @@ export default function UserManagementTable() {
                     <td className="font-medium">{user.name}</td>
                     <td className="text-slate-500">{user.email}</td>
                     <td className="text-sm text-slate-600">
-                      {user.role === "ADMIN" && user.department ? (
-                        user.department
+                      {user.mapel || user.department ? (
+                        user.mapel || user.department
                       ) : (
                         <span className="text-slate-300">-</span>
                       )}
@@ -347,6 +347,28 @@ export default function UserManagementTable() {
                         </option>
                       ))}
                     </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">
+                      Mapel
+                    </label>
+                    <input
+                      className="input text-sm py-1.5 px-3"
+                      placeholder="Masukkan Mapel"
+                      value={newMapel}
+                      onChange={(e) => setNewMapel(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">
+                      Kelas
+                    </label>
+                    <input
+                      className="input text-sm py-1.5 px-3"
+                      placeholder="Contoh: X RPL 1"
+                      value={newKelas}
+                      onChange={(e) => setNewKelas(e.target.value)}
+                    />
                   </div>
                 </div>
               )}

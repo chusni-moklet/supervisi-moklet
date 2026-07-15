@@ -54,7 +54,7 @@ export default function UpcomingTable() {
           <thead>
             <tr>
               <th>Guru</th>
-              <th>Bagian</th>
+              <th>Mata Pelajaran</th>
               <th>Tanggal</th>
             </tr>
           </thead>

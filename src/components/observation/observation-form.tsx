@@ -54,7 +54,7 @@ export default function ObservationForm() {
           .in("role", ["SUPER_ADMIN", "ADMIN", "KEPALA_SEKOLAH"]),
         supabase.from("indicator_categories").select("*").order("sort_order"),
         supabase.from("indicators").select("*").order("number"),
-        supabase.from("users").select("*").eq("role", "ADMIN"),
+        supabase.from("users").select("*").in("role", ["ADMIN", "GURU"]),
       ]);
 
       if (userRes.data) setUsers(userRes.data as User[]);
@@ -93,6 +93,7 @@ export default function ObservationForm() {
   const selectedTeacherId = watch("teacherId");
   const observerId = watch("observerId");
   const date = watch("date");
+  const notesValue = watch("notes");
   const selectedTeacher = teachers.find((t) => t.id === selectedTeacherId);
 
   const isHeaderComplete = Boolean(observerId && selectedTeacherId && date);
@@ -144,12 +145,13 @@ export default function ObservationForm() {
         {
           observer_id: data.observerId,
           teacher_id: data.teacherId,
-          department: selectedTeacher?.department,
+          department: selectedTeacher?.mapel || selectedTeacher?.department,
           date: data.date,
           total_score: totalScore,
           max_score: maxScore,
           nilai: nilai,
           category: category,
+          notes: data.notes,
         },
       ])
       .select();
@@ -260,12 +262,12 @@ export default function ObservationForm() {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                    Bagian
+                    Mata Pelajaran
                   </label>
                   <input
                     readOnly
                     className="input bg-slate-50 cursor-not-allowed"
-                    value={selectedTeacher?.department || ""}
+                    value={selectedTeacher ? (selectedTeacher.mapel || selectedTeacher.department || "Tidak ada mata pelajaran") : ""}
                     placeholder="Pilih guru terlebih dahulu"
                   />
                 </div>
@@ -281,6 +283,7 @@ export default function ObservationForm() {
                     id="date-input"
                     type="date"
                     className="input"
+                    min={new Date().toISOString().split("T")[0]}
                     {...register("date")}
                   />
                   {errors.date && (
@@ -368,21 +371,86 @@ export default function ObservationForm() {
               ))
             )}
 
+            {/* Recommendation/Notes */}
+            {isLoaded && categories.length > 0 && (
+              <div className="card p-5 animate-fade-in-up mt-6" style={{ animationDelay: `${(categories.length + 1) * 100}ms` }}>
+                <div className="flex items-center gap-3 mb-4">
+                  <h3 className="text-sm font-semibold text-slate-800">
+                    Rekomendasi / Catatan Supervisor
+                  </h3>
+                </div>
+                <div>
+                  <textarea
+                    className="input min-h-[120px] resize-y"
+                    placeholder="Masukkan rekomendasi atau catatan untuk guru yang diobservasi..."
+                    {...register("notes")}
+                    disabled={submitted || !isHeaderComplete}
+                  />
+                  {errors.notes && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {errors.notes.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Submit Button (mobile) */}
-            <div className="xl:hidden">
+            <div className="xl:hidden space-y-4">
+              {/* Indicator Status Tracker (Mobile) */}
+              {isLoaded && categories.length > 0 && (
+                <div className="card p-5">
+                  <h3 className="text-sm font-semibold text-slate-800 mb-3">
+                    Status Penilaian
+                  </h3>
+                  <div className="space-y-4 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
+                    {categories.map((cat, catIdx) => {
+                      const catLetter = String.fromCharCode(65 + catIdx);
+                      return (
+                        <div key={cat.id}>
+                          <div className="text-xs font-medium text-slate-600 mb-2 truncate" title={cat.name}>
+                            {catLetter}. {cat.name}
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {cat.indicators.map((ind) => {
+                              const isAnswered = scores[ind.id] !== undefined;
+                              return (
+                                <div
+                                  key={ind.id}
+                                  className={cn(
+                                    "w-7 h-7 rounded flex items-center justify-center text-xs font-bold transition-colors",
+                                    isAnswered
+                                      ? "bg-tech-blue text-white shadow-sm"
+                                      : "bg-red-50 text-red-500 border border-red-200"
+                                  )}
+                                  title={`Indikator ${ind.number}: ${isAnswered ? "Sudah Dinilai" : "Belum Dinilai"}`}
+                                >
+                                  {ind.number}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               <button
                 type="submit"
-                disabled={submitted || answeredCount < totalIndicators}
+                disabled={submitted || answeredCount < totalIndicators || !notesValue}
                 id="btn-submit-observation-mobile"
                 className="btn btn-primary w-full"
               >
                 <Save className="w-4 h-4" />
                 Simpan Observasi
               </button>
-              {answeredCount < totalIndicators && (
+              {(answeredCount < totalIndicators || !notesValue) && (
                 <p className="text-xs text-slate-400 text-center mt-2">
-                  Jawab semua {totalIndicators} indikator untuk submit (
-                  {answeredCount}/{totalIndicators})
+                  {answeredCount < totalIndicators 
+                    ? `Jawab semua ${totalIndicators} indikator untuk submit (${answeredCount}/${totalIndicators})` 
+                    : "Rekomendasi wajib diisi untuk submit"}
                 </p>
               )}
             </div>
@@ -390,7 +458,50 @@ export default function ObservationForm() {
 
           {/* Right: Score Panel (sticky) */}
           <div className="hidden xl:block">
-            <div className="sticky top-20">
+            <div className="sticky top-20 space-y-6">
+              {/* Indicator Status Tracker */}
+              {isLoaded && categories.length > 0 && (
+                <div
+                  className="card p-5 animate-fade-in-up"
+                  style={{ animationDelay: "200ms" }}
+                >
+                  <h3 className="text-sm font-semibold text-slate-800 mb-3">
+                    Status Penilaian
+                  </h3>
+                  <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                    {categories.map((cat, catIdx) => {
+                      const catLetter = String.fromCharCode(65 + catIdx);
+                      return (
+                        <div key={cat.id}>
+                          <div className="text-xs font-medium text-slate-600 mb-2 truncate" title={cat.name}>
+                            {catLetter}. {cat.name}
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {cat.indicators.map((ind) => {
+                              const isAnswered = scores[ind.id] !== undefined;
+                              return (
+                                <div
+                                  key={ind.id}
+                                  className={cn(
+                                    "w-7 h-7 rounded flex items-center justify-center text-xs font-bold transition-colors",
+                                    isAnswered
+                                      ? "bg-tech-blue text-white shadow-sm"
+                                      : "bg-red-50 text-red-500 border border-red-200"
+                                  )}
+                                  title={`Indikator ${ind.number}: ${isAnswered ? "Sudah Dinilai" : "Belum Dinilai"}`}
+                                >
+                                  {ind.number}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               <div
                 className="card p-5 animate-fade-in-up"
                 style={{ animationDelay: "300ms" }}
@@ -461,7 +572,7 @@ export default function ObservationForm() {
                 {/* Submit */}
                 <button
                   type="submit"
-                  disabled={submitted || answeredCount < totalIndicators}
+                  disabled={submitted || answeredCount < totalIndicators || !notesValue}
                   id="btn-submit-observation"
                   className="btn btn-primary w-full mt-5"
                 >
@@ -477,9 +588,11 @@ export default function ObservationForm() {
                     </>
                   )}
                 </button>
-                {!submitted && answeredCount < totalIndicators && (
+                {!submitted && (answeredCount < totalIndicators || !notesValue) && (
                   <p className="text-[11px] text-slate-400 text-center mt-2">
-                    Jawab semua indikator untuk submit
+                    {answeredCount < totalIndicators 
+                      ? "Jawab semua indikator untuk submit" 
+                      : "Rekomendasi wajib diisi"}
                   </p>
                 )}
               </div>

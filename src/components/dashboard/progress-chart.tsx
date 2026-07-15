@@ -1,112 +1,92 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-} from "recharts";
 import { supabase } from "@/lib/supabase";
-
-function getBarColor(score: number) {
-  if (score >= 90) return "#16A34A";
-  if (score >= 80) return "#2563EB";
-  if (score >= 70) return "#EAB308";
-  return "#DC2626";
-}
+import ScoreBadge from "@/components/ui/score-badge";
+import { getScoreCategory } from "@/lib/utils";
 
 export default function ProgressChart() {
   const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
-      const { data: obs } = await supabase
+      const { data: obs, error } = await supabase
         .from("observations")
-        .select("department, nilai");
+        .select(`
+          id,
+          nilai,
+          teacher_id,
+          department,
+          teacher:users!observations_teacher_id_fkey(name)
+        `);
+        
+      if (error) {
+        console.error("Error fetching top scores:", error);
+      }
+
       if (obs && obs.length > 0) {
-        const deptMap: Record<string, { total: number; count: number }> = {};
+        const teacherScores = new Map<string, any>();
+        
         obs.forEach((o) => {
-          if (!deptMap[o.department]) {
-            deptMap[o.department] = { total: 0, count: 0 };
+          const tId = o.teacher_id || 'unknown';
+          const currentMax = teacherScores.get(tId)?.score || -1;
+          if (o.nilai > currentMax) {
+             teacherScores.set(tId, {
+               id: tId,
+               name: o.teacher?.name || "Unknown",
+               score: o.nilai,
+               department: o.department,
+             });
           }
-          deptMap[o.department].total += Number(o.nilai);
-          deptMap[o.department].count += 1;
         });
 
-        const chartData = Object.entries(deptMap).map(
-          ([department, stats]) => ({
-            department:
-              department.length > 15
-                ? department.substring(0, 15) + "..."
-                : department,
-            avgScore: Math.round(stats.total / stats.count),
-            fullDepartment: department,
-          }),
-        );
+        const sortedTop = Array.from(teacherScores.values())
+          .sort((a, b) => b.score - a.score)
+          .slice(0, 10);
 
-        // Sort by score
-        chartData.sort((a, b) => b.avgScore - a.avgScore);
-        setData(chartData.slice(0, 8)); // Top 8
+        setData(sortedTop);
       }
+      setLoading(false);
     }
     loadData();
   }, []);
 
   return (
-    <div
-      className="card p-5 animate-fade-in-up"
-      style={{ animationDelay: "300ms" }}
-    >
+    <div className="card p-5 animate-fade-in-up flex flex-col h-full" style={{ animationDelay: "300ms" }}>
       <h3 className="text-sm font-semibold text-slate-800 mb-4">
-        Rata-rata Nilai per Departemen
+        10 Nilai Terbaik
       </h3>
-      <div className="h-[280px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={data}
-            margin={{ top: 5, right: 10, left: -10, bottom: 5 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-            <XAxis
-              dataKey="department"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fontSize: 11, fill: "#64748b" }}
-              dy={10}
-            />
-            <YAxis
-              domain={[0, 100]}
-              tick={{ fontSize: 11, fill: "#64748b" }}
-              tickLine={false}
-              axisLine={false}
-            />
-            <Tooltip
-              cursor={{ fill: "#f1f5f9" }}
-              contentStyle={{
-                borderRadius: "12px",
-                border: "none",
-                boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-              }}
-              labelFormatter={(label, payload) => {
-                if (payload && payload.length > 0) {
-                  return payload[0].payload.fullDepartment;
-                }
-                return label;
-              }}
-              formatter={(value: any) => [`${value}`, "Rata-rata Nilai"]}
-            />
-            <Bar dataKey="avgScore" radius={[6, 6, 0, 0]} barSize={32}>
-              {data.map((entry, index) => (
-                <Cell key={`bar-${index}`} fill={getBarColor(entry.avgScore)} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+      <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar max-h-[280px]">
+        {loading ? (
+          <div className="text-center text-sm text-slate-400 py-8 animate-pulse">Memuat data...</div>
+        ) : data.length === 0 ? (
+          <div className="text-center text-sm text-slate-400 py-8">Belum ada data observasi.</div>
+        ) : (
+          <div className="space-y-3">
+            {data.map((item, idx) => (
+              <div key={item.id} className="flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${
+                    idx === 0 ? 'bg-amber-100 text-amber-600' : 
+                    idx === 1 ? 'bg-slate-200 text-slate-600' :
+                    idx === 2 ? 'bg-orange-100 text-orange-600' : 'bg-blue-50 text-tech-blue'
+                  }`}>
+                    #{idx + 1}
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-slate-800">{item.name}</div>
+                    <div className="text-xs text-slate-500">{item.department}</div>
+                  </div>
+                </div>
+                <div className="flex flex-col items-end gap-1">
+                  <span className="text-lg font-bold text-slate-800">{item.score}</span>
+                  <ScoreBadge category={getScoreCategory(item.score)} />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

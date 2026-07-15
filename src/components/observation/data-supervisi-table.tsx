@@ -19,8 +19,8 @@ export default function DataSupervisiTable() {
         .select(
           `
           id, department, date, nilai, category,
-          teacher:teachers(name),
-          observer:users(name)
+          teacher:users!observations_teacher_id_fkey(name),
+          observer:users!observations_observer_id_fkey(name)
         `,
         )
         .order("date", { ascending: false });
@@ -56,11 +56,11 @@ export default function DataSupervisiTable() {
 
       <div className="card p-4 mb-4 animate-fade-in">
         <div className="relative max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            className="input pl-10"
-            placeholder="Cari guru, observer, atau bagian..."
+            className="input !pl-10"
+            placeholder="Cari guru, observer, atau mata pelajaran..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -82,7 +82,7 @@ export default function DataSupervisiTable() {
                 <tr>
                   <th>Tanggal</th>
                   <th>Guru</th>
-                  <th>Bagian</th>
+                  <th>Mata Pelajaran</th>
                   <th>Observer</th>
                   <th>Nilai</th>
                   <th>Kategori</th>
