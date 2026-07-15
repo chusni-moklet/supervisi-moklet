@@ -31,10 +31,12 @@ export default function ProgressChart() {
         obs.forEach((o) => {
           const tId = o.teacher_id || 'unknown';
           const currentMax = teacherScores.get(tId)?.score || -1;
+          const teacherObj: any = Array.isArray(o.teacher) ? o.teacher[0] : o.teacher;
+          
           if (o.nilai > currentMax) {
              teacherScores.set(tId, {
                id: tId,
-               name: o.teacher?.name || "Unknown",
+               name: teacherObj?.name || "Unknown",
                score: o.nilai,
                department: o.department,
              });
