@@ -5,12 +5,25 @@ import { supabase } from "@/lib/supabase";
 import { formatDateShort } from "@/lib/utils";
 import ScoreBadge from "@/components/ui/score-badge";
 import PageHeader from "@/components/ui/page-header";
-import { Search } from "lucide-react";
+import { Search, Trash2 } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 export default function DataSupervisiTable() {
   const [observations, setObservations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const { currentUser } = useAuth();
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Apakah Anda yakin ingin menghapus data supervisi ini?")) return;
+
+    const { error } = await supabase.from("observations").delete().eq("id", id);
+    if (!error) {
+      setObservations(observations.filter((o) => o.id !== id));
+    } else {
+      alert("Gagal menghapus data: " + error.message);
+    }
+  };
 
   useEffect(() => {
     async function loadData() {
@@ -86,6 +99,7 @@ export default function DataSupervisiTable() {
                   <th>Observer</th>
                   <th>Nilai</th>
                   <th>Kategori</th>
+                  {currentUser?.role === "SUPER_ADMIN" && <th>Aksi</th>}
                 </tr>
               </thead>
               <tbody>
@@ -101,11 +115,22 @@ export default function DataSupervisiTable() {
                     <td>
                       <ScoreBadge category={obs.category} />
                     </td>
+                    {currentUser?.role === "SUPER_ADMIN" && (
+                      <td>
+                        <button
+                          onClick={() => handleDelete(obs.id)}
+                          className="btn btn-ghost p-1.5 text-red-500 hover:bg-red-50"
+                          title="Hapus Data"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))}
                 {filteredData.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="text-center py-8 text-slate-400">
+                    <td colSpan={currentUser?.role === "SUPER_ADMIN" ? 7 : 6} className="text-center py-8 text-slate-400">
                       Tidak ada data ditemukan
                     </td>
                   </tr>
